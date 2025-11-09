@@ -34,10 +34,39 @@ export class EditorView implements AfterViewInit, OnDestroy {
       }
     });
     this._appInit.appAction$.pipe(takeUntil(this._destroy)).subscribe((action) => {
-      switch(action) {
+      switch (action) {
         case "format-code":
           if (this.editor) this.editor.getAction('editor.action.formatDocument')?.run();
           break;
+        case "scroll-to-top":
+          if (this.editor) this.editor.setScrollPosition({ scrollTop: 0 });
+          break;
+        case "scroll-to-bottom":
+          if (this.editor) {
+            const lineCount = this.editor.getModel()?.getLineCount();
+            this.editor.revealLine(lineCount ?? 0);
+          }
+          break;
+        case "undo":
+          if (this.editor) this.editor.trigger('undo-button', 'undo', null);
+          break;
+        case "redo":
+          if (this.editor) this.editor.trigger('undo-button', 'redo', null);
+          break;
+        case "font-up":
+          if (this.editor) {
+            const currentFontSize = this.editor.getRawOptions().fontSize ?? 14;
+            this.editor.updateOptions({ fontSize: currentFontSize + 2 });
+          }
+          break;
+        case "font-down":
+          if (this.editor) {
+            const currentFontSize = this.editor.getRawOptions().fontSize ?? 14;
+            this.editor.updateOptions({ fontSize: Math.max(6, currentFontSize - 2) });
+          }
+          break;
+        default:
+          console.warn("No such action exists", action);
       }
     })
   }
