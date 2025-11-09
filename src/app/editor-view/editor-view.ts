@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import * as monaco from 'monaco-editor';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { AppInit } from '@/service/app-init';
 
 @Component({
@@ -12,22 +12,27 @@ import { AppInit } from '@/service/app-init';
   standalone: true
 })
 export class EditorView implements AfterViewInit, OnDestroy {
-  editorOptions = { theme: 'vs', language: 'javascript' };
-  code: string = 'function x() {\nconsole.log("Hello world 😺!");\n}';
-  editor: monaco.editor.IStandaloneCodeEditor | null = null;
+  private _destroy: Subject<boolean> = new Subject<boolean>();
 
-  private themeModeSubscription: Subscription | null = null;
+  editorOptions = { theme: 'vs', language: 'javascript' };
+  code: string = 'function x() {\n\tconsole.log("Hello world 😺!");\n}';
+  editor: monaco.editor.IStandaloneCodeEditor | null = null;
 
   constructor(
     private _appInit: AppInit
   ) {
-    this.themeModeSubscription = this._appInit.themeMode$.subscribe((themeMode) => {
+    this._appInit.themeMode$.pipe(takeUntil(this._destroy)).subscribe((themeMode) => {
       if (this.editor) {
         const isDarkMode = (themeMode == 'dark') ? true : false;
         monaco.editor.setTheme(isDarkMode ? 'vs-dark' : 'vs');
         // monaco.editor.setTheme(isHighContrast && isDarkMode ? 'hc-black' : 'hc-light');
       }
     });
+    this._appInit.selectedLanguage$.pipe(takeUntil(this._destroy)).subscribe((language: any) => {
+      if (this.editor) {
+        monaco.editor.setModelLanguage(this.editor.getModel()!, language['id']);
+      }
+    })
   }
 
   ngAfterViewInit(): void {
@@ -39,6 +44,7 @@ export class EditorView implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.themeModeSubscription) this.themeModeSubscription.unsubscribe();
+    this._destroy.next(false);
+    this._destroy.complete();
   }
 }

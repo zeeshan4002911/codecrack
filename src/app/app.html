@@ -7,13 +7,20 @@
       <!-- Right section for language, formatter, theme toggle and more option -->
       <span class="d-flex align-items-center pe-1">
         <div class="dropdown px-2">
-          <button class="btn dropdown-header dropdown-toggle p-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown button
+          <button 
+            class="btn dropdown-header dropdown-toggle p-1" 
+            type="button" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false"
+          >
+            {{selectedLanguage?.['aliases']?.[0] || selectedLanguage['id']}}
           </button>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
+          <ul class="dropdown-menu w-100">
+            @for (language of languages; track language['id']) {
+              <li class="dropdown-item text-truncate" (click)="selectLanguage(language)">
+                {{language?.['aliases']?.[0] || (language['id'] | titlecase) }}
+              </li>
+            }
           </ul>
         </div>
 

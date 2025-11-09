@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AppInit } from './service/app-init';
 import { Popover } from 'bootstrap';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -10,9 +11,13 @@ import { Popover } from 'bootstrap';
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App implements AfterViewInit, OnDestroy {
+export class App implements OnInit, AfterViewInit, OnDestroy {
+  private _destroy: Subject<boolean> = new Subject<boolean>();
+
   themeMode: string | undefined = 'light';
-  
+  languages: any = [];
+  selectedLanguage: string = '';
+
   // More Options popover variables
   popoverInstance!: Popover | undefined;
   @ViewChild('popoverBtn', { static: false }) popoverBtn!: ElementRef;
@@ -21,10 +26,17 @@ export class App implements AfterViewInit, OnDestroy {
   constructor(
     private _appInit: AppInit
   ) {
-    this._appInit.themeMode$.subscribe(val => {
+    this._appInit.themeMode$.pipe(takeUntil(this._destroy)).subscribe((val: string) => {
       this.themeMode = val;
       this.bodyTagThemeUpdateHandler();
     });
+    this._appInit.selectedLanguage$.pipe(takeUntil(this._destroy)).subscribe((language: any) => {
+      this.selectedLanguage = language;
+    });
+  }
+
+  ngOnInit(): void {
+    this.languages = this._appInit.languages;
   }
 
   ngAfterViewInit(): void {
@@ -58,8 +70,15 @@ export class App implements AfterViewInit, OnDestroy {
 
   }
 
+  public selectLanguage(language: any) {
+    this.selectedLanguage = language;
+    this._appInit.setEditorLanguage(language);
+  }
+
   ngOnDestroy(): void {
-      this.themeMode = undefined;
-      this.popoverInstance = undefined;
+    this._destroy.next(false);
+    this._destroy.complete();
+    this.themeMode = undefined;
+    this.popoverInstance = undefined;
   }
 }
