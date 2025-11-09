@@ -1,3 +1,36 @@
 /* You can add global styles to this file, and also import other style files */
- @import "bootstrap/dist/css/bootstrap.min.css";
- @import "bootstrap-icons/font/bootstrap-icons.css";
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+
+.no-padding-popover .popover-body {
+    padding: 0 !important;
+}
+
+.btn-theme {
+    border-radius: 100%;
+    transform: scale(0.8);
+
+    &-light {
+        background-color: white !important;
+        color: #343a40 !important;
+    }
+
+    &-dark {
+        color: white !important;
+        background-color: #343a40 !important;
+    }
+    
+    &-borderless {
+        border: none;
+
+        &:active {
+            transform: scale(0.75);
+        }
+    }
+
+    .icon-super {
+        vertical-align: super;
+        font-size: 0.5rem;
+    }
+}

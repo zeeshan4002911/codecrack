@@ -12,8 +12,8 @@ import { AppInit } from '@/service/app-init';
   standalone: true
 })
 export class EditorView implements AfterViewInit, OnDestroy {
-  editorOptions = { theme: 'vs-dark', language: 'javascript' };
-  code: string = 'function x() {\nconsole.log("Hello world!") 😺;\n}';
+  editorOptions = { theme: 'vs', language: 'javascript' };
+  code: string = 'function x() {\nconsole.log("Hello world 😺!");\n}';
   editor: monaco.editor.IStandaloneCodeEditor | null = null;
 
   private themeModeSubscription: Subscription | null = null;
@@ -25,6 +25,7 @@ export class EditorView implements AfterViewInit, OnDestroy {
       if (this.editor) {
         const isDarkMode = (themeMode == 'dark') ? true : false;
         monaco.editor.setTheme(isDarkMode ? 'vs-dark' : 'vs');
+        // monaco.editor.setTheme(isHighContrast && isDarkMode ? 'hc-black' : 'hc-light');
       }
     });
   }
@@ -32,7 +33,8 @@ export class EditorView implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.editor = monaco.editor.create(document.getElementById('monaco-container')!, {
       value: this.code,
-      language: this.editorOptions.language
+      language: this.editorOptions.language,
+      automaticLayout: true
     })
   }
 
