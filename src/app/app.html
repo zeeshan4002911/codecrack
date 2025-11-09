@@ -1,14 +1,39 @@
 <section id="app-header">
   <nav class="navbar navbar-expand-lg navbar border-bottom p-0">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">&lt;/&gt; codeshare mini</a>
-      <button 
-        class="btn btn-theme py-1 px-2 btn-invert-theme"
-        [ngClass]="{'btn-theme-dark': !darkMode, 'btn-theme-light': darkMode}"
-        (click)="toggleTheme()"
-      >
-        <i [ngClass]="{'bi bi-sun': !darkMode, 'bi bi-moon-stars': darkMode}"></i>
-      </button>
+    <div class="container-fluid p-0">
+      <a class="navbar-brand ps-3" href="#">&lt;/&gt; codeshare mini</a>
+      <span class="d-flex pe-1">
+        <button 
+          class="btn btn-theme py-1 px-2"
+          [ngClass]="{
+            'btn-theme-dark': themeMode == 'light', 
+            'btn-theme-light': themeMode == 'dark'
+          }"
+          (click)="toggleTheme()"
+          data-bs-toggle="tooltip"
+          title="Toggle theme"
+        >
+          @if(themeMode == 'light') {
+            <i class="bi bi-moon-stars"></i>
+          } @else {
+            <i class="bi bi-sun"></i>
+          }
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-theme py-1 px-2" 
+          data-bs-container="body" 
+          data-bs-toggle="popover" 
+          data-bs-placement="bottom" 
+          data-bs-content="Coming Soon"
+        >
+          <i 
+            class="bi bi-three-dots-vertical"
+            data-bs-toggle="tooltip"
+            title="More options"
+          ></i>
+        </button>
+      </span>
     </div>
   </nav>
 </section>
