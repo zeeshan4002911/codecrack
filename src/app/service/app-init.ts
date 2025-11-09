@@ -25,6 +25,11 @@ export class AppInit {
 
   constructor() {
     this.languages = monaco.languages.getLanguages();
+    // JSON Comparison as custom language
+    this.languages.push({
+      "id": "json-compression",
+      "aliases": ["JSON Compression"]
+    });
   }
 
   toggleThemeMode(newValue: string) {

@@ -65,6 +65,21 @@ export class EditorView implements AfterViewInit, OnDestroy {
             this.editor.updateOptions({ fontSize: Math.max(6, currentFontSize - 2) });
           }
           break;
+        case "clear-all":
+          if (this.editor) this.editor.getModel()?.setValue('');
+          break;
+        case "json-compression":
+          if (this.editor) {
+            const jsonContent = this.editor.getValue();
+            try {
+              const jsonObject = JSON.parse(jsonContent);
+              const minifiedJson = JSON.stringify(jsonObject);
+              this.editor.setValue(minifiedJson);
+            } catch (error) {
+              console.error("Invalid JSON:", error);
+            }
+          }
+          break;
         default:
           console.warn("No such action exists", action);
       }

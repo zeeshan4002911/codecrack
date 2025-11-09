@@ -17,7 +17,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
   themeMode: string | undefined = 'light';
   languages: any = [];
-  selectedLanguage: string = '';
+  selectedLanguage: any = {};
   searchLanguage: string = '';
 
   // More Options popover variables
@@ -69,12 +69,14 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public moreOptionHanlder(btnName: string) {
+    if (this.selectedLanguage['id'] == 'json-compression') btnName = 'json-compression';
     this._appInit.dispatchAction(btnName);
   }
 
   public selectLanguage(language: any) {
     this.selectedLanguage = language;
-    this._appInit.setEditorLanguage(language);
+    if (language['id'] !== 'json-compression')
+      this._appInit.setEditorLanguage(language);
   }
 
   public filterLanguages() {
