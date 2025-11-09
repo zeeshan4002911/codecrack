@@ -4,10 +4,11 @@ import { CommonModule } from '@angular/common';
 import { AppInit } from './service/app-init';
 import { Popover } from 'bootstrap';
 import { Subject, takeUntil } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CommonModule],
+  imports: [RouterOutlet, CommonModule, FormsModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -17,6 +18,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   themeMode: string | undefined = 'light';
   languages: any = [];
   selectedLanguage: string = '';
+  searchLanguage: string = '';
 
   // More Options popover variables
   popoverInstance!: Popover | undefined;
@@ -73,6 +75,20 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   public selectLanguage(language: any) {
     this.selectedLanguage = language;
     this._appInit.setEditorLanguage(language);
+  }
+
+  public filterLanguages() {
+    const searchLanguage = this.searchLanguage.toLowerCase().trim();
+
+    this.languages = this._appInit.languages.filter((language: any) => {
+      const idSearch = language['id'].includes(searchLanguage);
+      let aliasesSearch = false;
+      if (language.hasOwnProperty('aliases') && Array.isArray(language['aliases'])) {
+        aliasesSearch = language['aliases'].some((val: string) => 
+        val.toLowerCase().includes(searchLanguage))
+      }
+      return idSearch || aliasesSearch;
+    })
   }
 
   ngOnDestroy(): void {

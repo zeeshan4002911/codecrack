@@ -18,4 +18,21 @@
     }
   }
 
+  .language-dropdown {
+    
+    #dropdownSearch {
+      width: 90%;
+    }
+
+    &-body {
+      max-height: 40vh;
+    }
+
+    .dropdown-item.active,
+    .dropdown-item:active {
+      background-color: #343a40 !important;
+      color: white !important;
+
+    }
+  }
 }

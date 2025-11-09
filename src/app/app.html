@@ -6,24 +6,41 @@
 
       <!-- Right section for language, formatter, theme toggle and more option -->
       <span class="d-flex align-items-center pe-1">
-        <div class="dropdown px-2">
+        <div class="language-dropdown dropdown px-2">
           <button 
             class="btn dropdown-header dropdown-toggle p-1 " 
             type="button" 
             data-bs-toggle="dropdown" 
             aria-expanded="false"
+            (click)="searchLanguage=''; filterLanguages()"
           >
             {{selectedLanguage?.['aliases']?.[0] || selectedLanguage['id']}}
           </button>
-          <ul class="dropdown-menu w-100">
+          <ul class="dropdown-menu w-100 pt-0">
+            <li class="d-flex flex-column align-items-center py-2">
+              <input 
+                id="dropdownSearch" 
+                type="text" 
+                class="form-control py-1" 
+                placeholder="Search..."
+                [(ngModel)]="searchLanguage"
+                (keyup)="filterLanguages()"
+                autocomplete="off"
+              />
+            </li>
+            <ul class="language-dropdown-body p-0 overflow-auto">
             @for (language of languages; track language['id']) {
               <li 
                 class="dropdown-item text-truncate cursor-pointer" 
                 (click)="selectLanguage(language)"
+                role="button"
+                data-bs-toggle="tooltip"
+                [title]="language?.['aliases']?.[0] || (language['id'] | titlecase)"
               >
                 {{language?.['aliases']?.[0] || (language['id'] | titlecase) }}
               </li>
             }
+            </ul>
           </ul>
         </div>
 
