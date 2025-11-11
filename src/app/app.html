@@ -2,7 +2,26 @@
   <nav class="navbar navbar-expand-lg navbar border-bottom p-0">
     <div class="container-fluid p-0 justify-content-around justify-content-md-between">
       <!-- Left Application title -->
-      <a class="navbar-brand ps-3" href="#">&lt;/&gt; codecrack</a>
+      <span class="d-flex align-items-center justify-content-center">
+        <a class="navbar-brand ps-3">&lt;/&gt; codecrack</a>
+        <nav class="nav"
+          [ngClass]="{
+            'btn-nav-light': themeMode == 'light',
+            'btn-nav-dark': themeMode == 'dark'
+          }" 
+        >
+          <a class="btn-nav cursor-pointer px-2 py-1 active">Editor</a>
+          <a class="btn-nav cursor-pointer px-2 py-1" (click)="openToast()">Diff-Checker</a>
+          <a 
+            class="btn-nav cursor-pointer px-2 py-1"
+            (click)="this.moreOptionHanlder('format-code')"
+            data-bs-toggle="tooltip"
+            title="Formatter"
+          >
+            &lcub;&int;&rcub;
+          </a>
+        </nav>
+      </span>
 
       <!-- Right section for language, formatter, theme toggle and more option -->
       <span class="d-flex align-items-center pe-1">
@@ -44,7 +63,7 @@
           </ul>
         </div>
 
-        <button 
+        <!-- <button 
           class="btn btn-theme py-1 px-2"
           [ngClass]="{
             'btn-theme-dark': themeMode == 'light', 
@@ -55,7 +74,7 @@
           title="Formatter"
         >
           <i class="bi bi-braces"></i>
-        </button>
+        </button> -->
         
         <button 
           class="btn btn-theme py-1 px-2"
@@ -104,6 +123,36 @@
     </div>
   </nav>
 </section>
+
+<!-- Generic Bootstrap Modal -->
+<div class="modal fade" id="bModal" tabindex="-1" aria-labelledby="bModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- <h5 class="modal-title" id="bModalLabel">Title</h5> -->
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Modal content goes here -->
+        <p>Feature is Coming Soon.</p>
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<!-- Generic Bootstrap Toast -->
+<div id="bToast" class="toast align-items-center end-0 position-absolute mx-3" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="d-flex">
+    <div class="toast-body">
+      Feature is Coming Soon.
+    </div>
+    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+  </div>
+</div>
 
 <!-- More Option Feature Buttons -->
 <ng-template #popoverContent>

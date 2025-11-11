@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, TemplateRef, V
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AppInit } from './service/app-init';
-import { Popover } from 'bootstrap';
+import { Popover, Modal, Toast} from 'bootstrap';
 import { Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 
@@ -24,6 +24,9 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   popoverInstance!: Popover | undefined;
   @ViewChild('popoverBtn', { static: false }) popoverBtn!: ElementRef;
   @ViewChild('popoverContent', { static: false }) popoverContent!: TemplateRef<any>;
+  
+  private bModal: any;
+  private bToast: any;
 
   constructor(
     private _appInit: AppInit
@@ -51,6 +54,18 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       content: popoverContentEl,
       customClass: 'no-padding-popover'
     });
+
+    // Initialize Bootstrap Modal
+    const modalElement = document.getElementById('bModal');
+    if (modalElement) {
+      this.bModal = new Modal(modalElement);
+    }
+    
+    // Initialize Bootstrap Toast
+    const toastElement = document.getElementById('bToast');
+    if (toastElement) {
+      this.bToast = new Toast(toastElement);
+    }
   }
 
   public toggleTheme() {
@@ -92,6 +107,10 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       return idSearch || aliasesSearch;
     })
   }
+
+  // Handler for Bootstrap Modal and Toast open
+  openModal = () => (this.bModal) ? this.bModal.show() : null;
+  openToast = () => (this.bToast) ? this.bToast.show() : null;
 
   ngOnDestroy(): void {
     this._destroy.next(false);

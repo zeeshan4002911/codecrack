@@ -18,6 +18,25 @@
     }
   }
 
+  .btn-nav {
+    font-family: monospace;
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: inherit;
+
+    &.active {
+      text-decoration: underline;
+    }
+
+    &-light {
+      color: #343a40 !important;
+    }
+
+    &-dark {
+      color: white !important;
+    }
+  }
+
   .language-dropdown {
     
     #dropdownSearch {
@@ -34,5 +53,10 @@
       color: white !important;
 
     }
+  }
+
+  #bToast {
+    z-index: 1000;
+    top: 10vh;
   }
 }
