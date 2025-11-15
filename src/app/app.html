@@ -12,14 +12,6 @@
         >
           <a class="btn-nav cursor-pointer px-2 py-1 active">Editor</a>
           <a class="btn-nav cursor-pointer px-2 py-1" (click)="openToast()">Diff-Checker</a>
-          <a 
-            class="btn-nav cursor-pointer px-2 py-1"
-            (click)="this.moreOptionHanlder('format-code')"
-            data-bs-toggle="tooltip"
-            title="Formatter"
-          >
-            &lcub;&int;&rcub;
-          </a>
         </nav>
       </span>
 
@@ -62,7 +54,7 @@
           </ul>
         </div>
 
-        <!-- <button 
+        <button 
           class="btn btn-theme py-1 px-2"
           [ngClass]="{
             'btn-theme-dark': themeMode == 'light', 
@@ -73,7 +65,7 @@
           title="Formatter"
         >
           <i class="bi bi-braces"></i>
-        </button> -->
+        </button>
         
         <button 
           class="btn btn-theme py-1 px-2"

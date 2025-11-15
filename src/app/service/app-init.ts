@@ -6,7 +6,11 @@ import * as monaco from 'monaco-editor';
   providedIn: 'root',
 })
 export class AppInit {
-  private themeModeSubject = new BehaviorSubject<string>("light");
+  // Check browser preferred theme based on user's browser setting
+  prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  private themeModeSubject = new BehaviorSubject<string>(
+    (this.prefersDarkMode) ? "dark" : "light"
+  );
   themeMode$ = this.themeModeSubject.asObservable();
 
   languages: any = [];

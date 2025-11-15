@@ -14,6 +14,8 @@ import { AppInit } from '@/service/app-init';
 export class EditorView implements AfterViewInit, OnDestroy {
   private _destroy: Subject<boolean> = new Subject<boolean>();
 
+  themeMode: string | undefined = 'light';
+
   editorOptions = { theme: 'vs', language: 'javascript' };
   code: string = 'function x() {\n\tconsole.log("Hello world 😺!");\n}';
   editor: monaco.editor.IStandaloneCodeEditor | null = null;
@@ -22,6 +24,7 @@ export class EditorView implements AfterViewInit, OnDestroy {
     private _appInit: AppInit
   ) {
     this._appInit.themeMode$.pipe(takeUntil(this._destroy)).subscribe((themeMode) => {
+      this.themeMode = themeMode;
       if (this.editor) {
         const isDarkMode = (themeMode == 'dark') ? true : false;
         monaco.editor.setTheme(isDarkMode ? 'vs-dark' : 'vs');
@@ -75,6 +78,8 @@ export class EditorView implements AfterViewInit, OnDestroy {
               const jsonObject = JSON.parse(jsonContent);
               const minifiedJson = JSON.stringify(jsonObject);
               this.editor.setValue(minifiedJson);
+              // Setting the monaco language as json to have highlight in string
+              monaco.editor.setModelLanguage(this.editor.getModel()!, 'json');
             } catch (error) {
               console.error("Invalid JSON:", error);
             }
@@ -87,15 +92,18 @@ export class EditorView implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    const isDarkMode = (this.themeMode == 'dark') ? true : false;
     this.editor = monaco.editor.create(document.getElementById('monaco-container')!, {
       value: this.code,
       language: this.editorOptions.language,
-      automaticLayout: true
+      automaticLayout: true,
+      theme: (isDarkMode) ? 'vs-dark' : 'vs'
     })
   }
 
   ngOnDestroy(): void {
     this._destroy.next(false);
     this._destroy.complete();
+    this.themeMode = undefined;
   }
 }
