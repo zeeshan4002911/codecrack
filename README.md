@@ -42,4 +42,19 @@ The application planned future enhancements include:
 Now open your browser and visit http://localhost:3000
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.9.
-And then later Vite gets Added added for development, version 7.2.2 with @analogjs/vite-plugin-angular version 2.0.3.
+And then later Vite gets added for development, version 7.2.2 with @analogjs/vite-plugin-angular version 2.0.3.
+
+## Changelog
+
+###### 08 Nov, 2025
+> * Editor Integrated
+> * Theme toggle feature
+
+###### 09 Nov, 2025
+> * Editor language dropdown and search functionality
+> * Added formatter, editor theme changes and responsiveness
+
+###### 11 Nov, 2025
+> * First Production version
+> * Changes in build process
+> * JSON Compression feature
