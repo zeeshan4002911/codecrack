@@ -14,18 +14,31 @@ export class AppInit {
   themeMode$ = this.themeModeSubject.asObservable();
 
   languages: any = [];
-  private selectedLanguageSubject = new BehaviorSubject<any>(
-    {
-      "id": "javascript",
-      "aliases": [
-        "JavaScript"
-      ]
-    }
-  );
+  selectedLanguage = {
+    "id": "javascript",
+    "aliases": [
+      "JavaScript"
+    ]
+  };
+  private selectedLanguageSubject = new BehaviorSubject<any>(this.selectedLanguage);
   selectedLanguage$ = this.selectedLanguageSubject.asObservable();
 
   private appActionSubject = new Subject();
   appAction$ = this.appActionSubject.asObservable();
+
+  // Default editor Option, gets overwritten on run time 
+  editorOptions = {
+    theme: 'vs',
+    language: 'javascript',
+    automaticLayout: true,
+    scrollBeyondLastLine: true,
+    wordWrap: true // For toggling the word wrap 'on' & 'off'
+  };
+
+  // Storage for code entered on the editor and diff checker by user
+  editorCode: string = 'function x() {\n\tconsole.log("Hello world 😺!");\n}';
+  originalCode: string = 'function x() {\n\tconsole.log("Hello world from left 😺!");\n}';
+  modifiedCode: string = 'function x() {\n\tconsole.log("Hello world from right 😺!");\n}';
 
   constructor() {
     this.languages = monaco.languages.getLanguages();
@@ -46,5 +59,17 @@ export class AppInit {
 
   dispatchAction(actionName: string) {
     this.appActionSubject.next(actionName);
+  }
+
+  setEditorCode(code: string) {
+    this.editorCode = code;
+  }
+
+  setOriginalCode(code: string) {
+    this.originalCode = code;
+  }
+
+  setModifiedCode(code: string) {
+    this.modifiedCode = code;
   }
 }

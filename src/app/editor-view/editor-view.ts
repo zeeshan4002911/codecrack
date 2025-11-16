@@ -13,112 +13,114 @@ import { AppInit } from '@/service/app-init';
 })
 export class EditorView implements AfterViewInit, OnDestroy {
   private _destroy: Subject<boolean> = new Subject<boolean>();
-
-  editorOptions = {
-    theme: 'vs',
-    language: 'javascript',
-    automaticLayout: true,
-    scrollBeyondLastLine: true,
-    wordWrap: true // For toggling the word wrap 'on' & 'off'
-  };
-  code: string = 'function x() {\n\tconsole.log("Hello world 😺!");\n}';
-  editor: monaco.editor.IStandaloneCodeEditor | null = null;
+  private editorInstance: monaco.editor.IStandaloneCodeEditor | null = null;
 
   constructor(
     private _appInit: AppInit
   ) {
+    // Subscription for theme change for diff checker
     this._appInit.themeMode$.pipe(takeUntil(this._destroy)).subscribe((themeMode) => {
       const isDarkMode = (themeMode == 'dark') ? true : false;
-      this.editorOptions.theme = isDarkMode ? 'vs-dark' : 'vs';
-      if (this.editor) {
-        monaco.editor.setTheme(this.editorOptions.theme);
+      this._appInit.editorOptions.theme = isDarkMode ? 'vs-dark' : 'vs';
+      if (this.editorInstance) {
+        monaco.editor.setTheme(this._appInit.editorOptions.theme);
         // monaco.editor.setTheme(isHighContrast && isDarkMode ? 'hc-black' : 'hc-light');
       }
     });
+    
+    // Subscription for language change
     this._appInit.selectedLanguage$.pipe(takeUntil(this._destroy)).subscribe((language: any) => {
-      this.editorOptions.language = language['id'];
-      if (this.editor) {
-        monaco.editor.setModelLanguage(this.editor.getModel()!, language['id']);
+      this._appInit.editorOptions.language = language['id'];
+      if (this.editorInstance) {
+        monaco.editor.setModelLanguage(this.editorInstance.getModel()!, language['id']);
       }
     });
+
+    // Subscription for more option action resolver
     this._appInit.appAction$.pipe(takeUntil(this._destroy)).subscribe((action) => {
-      if (!this.editor) {
+      if (!this.editorInstance) {
         console.error("Editor doesn't exists to perform action");
         return;
       }
       switch (action) {
         case "format-code":
-          this.editor.getAction('editor.action.formatDocument')?.run();
+          this.editorInstance.getAction('editor.action.formatDocument')?.run();
           break;
         case "scroll-to-top":
-          this.editor.setScrollPosition({ scrollTop: 0 });
+          this.editorInstance.setScrollPosition({ scrollTop: 0 });
           break;
         case "scroll-to-bottom":
-          const lineCount = this.editor.getModel()?.getLineCount();
-          this.editor.revealLine(lineCount ?? 0);
+          const lineCount = this.editorInstance.getModel()?.getLineCount();
+          this.editorInstance.revealLine(lineCount ?? 0);
           break;
         case "undo":
-          this.editor.trigger('undo-button', 'undo', null);
+          this.editorInstance.trigger('undo-button', 'undo', null);
           break;
         case "redo":
-          this.editor.trigger('undo-button', 'redo', null);
+          this.editorInstance.trigger('undo-button', 'redo', null);
           break;
         case "font-up":
-          const currFS_1 = this.editor.getRawOptions().fontSize ?? 14;
-          this.editor.updateOptions({ fontSize: currFS_1 + 2 });
+          const currFS_1 = this.editorInstance.getRawOptions().fontSize ?? 14;
+          this.editorInstance.updateOptions({ fontSize: currFS_1 + 2 });
           break;
         case "font-down":
-          const currFS_2 = this.editor.getRawOptions().fontSize ?? 14;
-          this.editor.updateOptions({ fontSize: Math.max(6, currFS_2 - 2) });
+          const currFS_2 = this.editorInstance.getRawOptions().fontSize ?? 14;
+          this.editorInstance.updateOptions({ fontSize: Math.max(6, currFS_2 - 2) });
           break;
         case "clear-all":
           // Triggering undo stack and executing edit to empty editor
-          this.editor.pushUndoStop();
-          this.editor.executeEdits(
+          this.editorInstance.pushUndoStop();
+          this.editorInstance.executeEdits(
             'clear-all',
             [
               {
-                range: this.editor.getModel()!.getFullModelRange(),
+                range: this.editorInstance.getModel()!.getFullModelRange(),
                 text: '',
                 forceMoveMarkers: true
               }
             ]
           )
-          this.editor.pushUndoStop();
+          this.editorInstance.pushUndoStop();
           break;
         case "json-compression":
-          const jsonContent = this.editor.getValue();
+          const jsonContent = this.editorInstance.getValue();
           try {
             const jsonObject = JSON.parse(jsonContent);
             const minifiedJson = JSON.stringify(jsonObject);
-            this.editor.setValue(minifiedJson);
+            this.editorInstance.setValue(minifiedJson);
             // Setting the monaco language as json to have highlight in string
-            monaco.editor.setModelLanguage(this.editor.getModel()!, 'json');
+            monaco.editor.setModelLanguage(this.editorInstance.getModel()!, 'json');
           } catch (error) {
             console.error("Invalid JSON:", error);
           }
           break;
         case "word-wrap-toggle":
-          this.editorOptions.wordWrap = !this.editorOptions.wordWrap;
-          this.editor.updateOptions({
-            wordWrap: this.editorOptions.wordWrap ? 'on' : 'off'
+          this._appInit.editorOptions.wordWrap = !this._appInit.editorOptions.wordWrap;
+          this.editorInstance.updateOptions({
+            wordWrap: this._appInit.editorOptions.wordWrap ? 'on' : 'off'
           })
           break;
         default:
           console.warn("No such action exists", action);
       }
-    })
+    });
   }
 
   ngAfterViewInit(): void {
-    this.editor = monaco.editor.create(document.getElementById('monaco-container')!, {
-      value: this.code,
-      language: this.editorOptions.language,
-      automaticLayout: this.editorOptions.automaticLayout,
-      scrollBeyondLastLine: this.editorOptions.scrollBeyondLastLine,
-      wordWrap: this.editorOptions.wordWrap ? 'on' : 'off',
-      theme: this.editorOptions.theme
-    })
+    this.editorInstance = monaco.editor.create(document.getElementById('monaco-container')!, {
+      value: this._appInit.editorCode,
+      language: this._appInit.editorOptions.language,
+      automaticLayout: this._appInit.editorOptions.automaticLayout,
+      scrollBeyondLastLine: this._appInit.editorOptions.scrollBeyondLastLine,
+      wordWrap: this._appInit.editorOptions.wordWrap ? 'on' : 'off',
+      theme: this._appInit.editorOptions.theme
+    });
+
+    // Listening for the changes in editor and update it
+    this.editorInstance?.onDidChangeModelContent(() => {
+      const code = this.editorInstance?.getValue() ?? "";
+      this._appInit.setEditorCode(code);
+    });
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -132,6 +134,6 @@ export class EditorView implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this._destroy.next(false);
     this._destroy.complete();
-    if (this.editor) this.editor.dispose();
+    if (this.editorInstance) this.editorInstance.dispose();
   }
 }
