@@ -1,26 +1,37 @@
 <section id="app-header">
   <nav class="navbar navbar-expand-lg navbar border-bottom p-0">
-    <div class="container-fluid p-0 justify-content-around justify-content-md-between">
+    <div class="container-fluid p-0 justify-content-between">
       <!-- Left Application title -->
       <span class="d-flex align-items-center justify-content-center">
-        <a class="navbar-brand ps-3">&lt;/&gt; codecrack</a>
-        <nav class="nav"
-          [ngClass]="{
-            'btn-nav-light': themeMode == 'light',
-            'btn-nav-dark': themeMode == 'dark'
-          }" 
-        >
-          <a class="btn-nav cursor-pointer px-2 py-1 active">Editor</a>
-          <a class="btn-nav cursor-pointer px-2 py-1" (click)="openToast()">Diff-Checker</a>
-          <a 
-            class="btn-nav cursor-pointer px-2 py-1"
-            (click)="this.moreOptionHanlder('format-code')"
-            data-bs-toggle="tooltip"
-            title="Formatter"
+        @if (isMobile) {
+          <button class="btn btn-theme-borderless py-0 ps-3 pe-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMobile" aria-controls="offcanvasMobile">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        }
+        @else {
+          <a class="navbar-brand px-3 m-0">&lt;/&gt; codecrack</a>
+          <nav class="nav"
+            [ngClass]="{
+              'btn-nav-light': themeMode == 'light',
+              'btn-nav-dark': themeMode == 'dark'
+            }" 
           >
-            &lcub;&int;&rcub;
-          </a>
-        </nav>
+            <a 
+              class="btn-nav cursor-pointer px-2 py-1 active"
+              [ngClass]="{'active': selectedTab == 'editor'}"
+              (click)="setSelectedTab('editor')"
+            >
+              Editor
+            </a>
+            <a 
+              class="btn-nav cursor-pointer px-2 py-1"
+              [ngClass]="{'active': selectedTab == 'diff-checker'}"
+              (click)="setSelectedTab('diff-checker')"
+            >
+              Diff-Checker
+            </a>
+          </nav>
+        }
       </span>
 
       <!-- Right section for language, formatter, theme toggle and more option -->
@@ -62,7 +73,7 @@
           </ul>
         </div>
 
-        <!-- <button 
+        <button 
           class="btn btn-theme py-1 px-2"
           [ngClass]="{
             'btn-theme-dark': themeMode == 'light', 
@@ -73,7 +84,7 @@
           title="Formatter"
         >
           <i class="bi bi-braces"></i>
-        </button> -->
+        </button>
         
         <button 
           class="btn btn-theme py-1 px-2"
@@ -123,6 +134,38 @@
   </nav>
 </section>
 
+<div class="offcanvas offcanvas-start w-50" tabindex="-1" id="offcanvasMobile" aria-labelledby="offcanvasLabel">
+  <div class="offcanvas-header">
+      <a class="navbar-brand px-3 m-0 offcanvas-title" id="offcanvasLabel">&lt;/&gt; codecrack</a>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <nav class="nav d-flex flex-column"
+      [ngClass]="{
+        'btn-nav-light': themeMode == 'light',
+        'btn-nav-dark': themeMode == 'dark'
+      }" 
+    >
+      <a 
+        class="btn-nav cursor-pointer px-2 py-1 active"
+        [ngClass]="{'active': selectedTab == 'editor'}"
+        (click)="setSelectedTab('editor')"
+        data-bs-dismiss="offcanvas"
+      >
+        Editor
+      </a>
+      <a 
+        class="btn-nav cursor-pointer px-2 py-1"
+        [ngClass]="{'active': selectedTab == 'diff-checker'}"
+        (click)="setSelectedTab('diff-checker')"
+        data-bs-dismiss="offcanvas"
+      >
+        Diff-Checker
+      </a>
+    </nav>
+  </div>
+</div>
+
 <!-- Generic Bootstrap Modal -->
 <div class="modal fade" id="bModal" tabindex="-1" aria-labelledby="bModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -155,7 +198,7 @@
 
 <!-- More Option Feature Buttons -->
 <ng-template #popoverContent>
-  <div class="d-flex flex-column">
+  <div class="popover-content d-flex flex-column">
     <div class="d-flex justify-content-center">
       <button 
         class="btn btn-theme btn-theme-borderless py-1 px-2" 
@@ -210,8 +253,35 @@
         A <i class="bi bi-caret-down-fill icon-super"></i>
       </button>
     </div>
+    <div class="d-flex justify-content-center">
+      <button 
+        class="btn btn-theme btn-theme-borderless py-1 px-2" 
+        (click)="moreOptionHanlder('word-wrap-toggle')"
+        data-bs-toggle="tooltip"
+        title="Toggle word wrap"
+      >
+        <i class="bi bi-text-wrap"></i>
+      </button>
+      <button 
+        class="btn btn-theme btn-theme-borderless py-1 px-2" 
+        (click)="resetApp()"
+        data-bs-toggle="tooltip"
+        title="Reset"
+      >
+        <i class="bi bi-arrow-repeat"></i>
+      </button>
+    </div>
   </div>
 </ng-template>
 
 <!-- Router outlet for rendering views -->
-<router-outlet></router-outlet>
+<!-- <router-outlet></router-outlet> -->
+
+@switch (selectedTab) {
+  @case ('editor') {
+    <app-editor-view></app-editor-view>
+  }
+  @case ('diff-checker') {
+    <app-diff-checker-view></app-diff-checker-view>
+  }
+}

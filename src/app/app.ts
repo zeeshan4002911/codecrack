@@ -1,20 +1,24 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+// import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AppInit } from './service/app-init';
-import { Popover, Modal, Toast} from 'bootstrap';
+import { Popover, Modal, Toast } from 'bootstrap';
 import { Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { EditorView } from './editor-view/editor-view';
+import { DiffCheckerView } from './diff-checker-view/diff-checker-view';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, EditorView, DiffCheckerView],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App implements OnInit, AfterViewInit, OnDestroy {
   private _destroy: Subject<boolean> = new Subject<boolean>();
+  public isMobile: boolean = false;
 
+  selectedTab: string = 'editor';
   themeMode: string | undefined = 'light';
   languages: any = [];
   selectedLanguage: any = {};
@@ -24,7 +28,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   popoverInstance!: Popover | undefined;
   @ViewChild('popoverBtn', { static: false }) popoverBtn!: ElementRef;
   @ViewChild('popoverContent', { static: false }) popoverContent!: TemplateRef<any>;
-  
+
   private bModal: any;
   private bToast: any;
 
@@ -38,10 +42,13 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     this._appInit.selectedLanguage$.pipe(takeUntil(this._destroy)).subscribe((language: any) => {
       this.selectedLanguage = language;
     });
+
+    this.checkIfMobile();
   }
 
   ngOnInit(): void {
     this.languages = this._appInit.languages;
+    this.selectedTab = this._appInit.selectedTab;
   }
 
   ngAfterViewInit(): void {
@@ -60,12 +67,23 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     if (modalElement) {
       this.bModal = new Modal(modalElement);
     }
-    
+
     // Initialize Bootstrap Toast
     const toastElement = document.getElementById('bToast');
     if (toastElement) {
       this.bToast = new Toast(toastElement);
     }
+
+    this.checkIfMobile();
+  }
+
+  private checkIfMobile() {
+    this.isMobile = window.innerWidth <= 768;
+  }
+
+  public setSelectedTab(tabName: string) {
+    this.selectedTab = tabName;
+    this._appInit.setSelectedTab(tabName);
   }
 
   public toggleTheme() {
@@ -101,16 +119,38 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       const idSearch = language['id'].includes(searchLanguage);
       let aliasesSearch = false;
       if (language.hasOwnProperty('aliases') && Array.isArray(language['aliases'])) {
-        aliasesSearch = language['aliases'].some((val: string) => 
-        val.toLowerCase().includes(searchLanguage))
+        aliasesSearch = language['aliases'].some((val: string) =>
+          val.toLowerCase().includes(searchLanguage))
       }
       return idSearch || aliasesSearch;
     })
   }
 
+  public resetApp() {
+    this._appInit.resetApp();
+  }
+
   // Handler for Bootstrap Modal and Toast open
   openModal = () => (this.bModal) ? this.bModal.show() : null;
   openToast = () => (this.bToast) ? this.bToast.show() : null;
+
+  // Hide popover once any any click happen outside the content of it
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    if (this.popoverInstance) {
+      const targetElement = event.target as HTMLElement;
+      const isInisdePopover = document.querySelector('.popover-content')?.contains(targetElement);
+
+      if (!isInisdePopover) {
+        this.popoverInstance.hide();
+      }
+    }
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event): void {
+    this.checkIfMobile();
+  }
 
   ngOnDestroy(): void {
     this._destroy.next(false);
