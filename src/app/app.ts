@@ -2,12 +2,11 @@ import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, 
 // import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AppInit } from './service/app-init';
-import { Popover, Modal, Toast} from 'bootstrap';
+import { Popover, Modal, Toast } from 'bootstrap';
 import { Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { EditorView } from './editor-view/editor-view';
 import { DiffCheckerView } from './diff-checker-view/diff-checker-view';
-import * as monaco from 'monaco-editor';
 
 @Component({
   selector: 'app-root',
@@ -28,7 +27,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   popoverInstance!: Popover | undefined;
   @ViewChild('popoverBtn', { static: false }) popoverBtn!: ElementRef;
   @ViewChild('popoverContent', { static: false }) popoverContent!: TemplateRef<any>;
-  
+
   private bModal: any;
   private bToast: any;
 
@@ -46,6 +45,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.languages = this._appInit.languages;
+    this.selectedTab = this._appInit.selectedTab;
   }
 
   ngAfterViewInit(): void {
@@ -64,12 +64,17 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     if (modalElement) {
       this.bModal = new Modal(modalElement);
     }
-    
+
     // Initialize Bootstrap Toast
     const toastElement = document.getElementById('bToast');
     if (toastElement) {
       this.bToast = new Toast(toastElement);
     }
+  }
+
+  public setSelectedTab(tabName: string) {
+    this.selectedTab = tabName;
+    this._appInit.setSelectedTab(tabName);
   }
 
   public toggleTheme() {
@@ -105,8 +110,8 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       const idSearch = language['id'].includes(searchLanguage);
       let aliasesSearch = false;
       if (language.hasOwnProperty('aliases') && Array.isArray(language['aliases'])) {
-        aliasesSearch = language['aliases'].some((val: string) => 
-        val.toLowerCase().includes(searchLanguage))
+        aliasesSearch = language['aliases'].some((val: string) =>
+          val.toLowerCase().includes(searchLanguage))
       }
       return idSearch || aliasesSearch;
     })

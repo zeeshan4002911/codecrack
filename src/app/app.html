@@ -13,14 +13,14 @@
           <a 
             class="btn-nav cursor-pointer px-2 py-1 active"
             [ngClass]="{'active': selectedTab == 'editor'}"
-            (click)="selectedTab='editor'"
+            (click)="setSelectedTab('editor')"
           >
             Editor
           </a>
           <a 
             class="btn-nav cursor-pointer px-2 py-1"
             [ngClass]="{'active': selectedTab == 'diff-checker'}"
-            (click)="selectedTab='diff-checker'"
+            (click)="setSelectedTab('diff-checker')"
           >
             Diff-Checker
           </a>
