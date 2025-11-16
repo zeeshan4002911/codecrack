@@ -65,7 +65,6 @@ export class EditorView implements AfterViewInit, OnDestroy {
         case "font-up":
           const currFS_1 = this.editor.getRawOptions().fontSize ?? 14;
           this.editor.updateOptions({ fontSize: currFS_1 + 2 });
-
           break;
         case "font-down":
           const currFS_2 = this.editor.getRawOptions().fontSize ?? 14;
@@ -125,11 +124,7 @@ export class EditorView implements AfterViewInit, OnDestroy {
   handleKeyboardEvent(event: KeyboardEvent) {
     // Toggle word wrap on Alt + Z key combination
     if (event.altKey && event.key.toLowerCase() == 'z' && !event.shiftKey) {
-      this.editorOptions.wordWrap = !this.editorOptions.wordWrap;
-      if (this.editor)
-        this.editor.updateOptions({
-          wordWrap: this.editorOptions.wordWrap ? 'on' : 'off'
-        })
+      this._appInit.dispatchAction('word-wrap-toggle');
     }
   }
 
