@@ -36,6 +36,7 @@ export class EditorView implements AfterViewInit, OnDestroy {
       }
     });
     this._appInit.selectedLanguage$.pipe(takeUntil(this._destroy)).subscribe((language: any) => {
+      this.editorOptions.language = language['id'];
       if (this.editor) {
         monaco.editor.setModelLanguage(this.editor.getModel()!, language['id']);
       }
@@ -131,5 +132,6 @@ export class EditorView implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this._destroy.next(false);
     this._destroy.complete();
+    if (this.editor) this.editor.dispose();
   }
 }

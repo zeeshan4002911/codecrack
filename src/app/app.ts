@@ -1,20 +1,24 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+// import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AppInit } from './service/app-init';
 import { Popover, Modal, Toast} from 'bootstrap';
 import { Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { EditorView } from './editor-view/editor-view';
+import { DiffCheckerView } from './diff-checker-view/diff-checker-view';
+import * as monaco from 'monaco-editor';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, EditorView, DiffCheckerView],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App implements OnInit, AfterViewInit, OnDestroy {
   private _destroy: Subject<boolean> = new Subject<boolean>();
 
+  selectedTab: string = 'editor';
   themeMode: string | undefined = 'light';
   languages: any = [];
   selectedLanguage: any = {};

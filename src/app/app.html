@@ -10,8 +10,20 @@
             'btn-nav-dark': themeMode == 'dark'
           }" 
         >
-          <a class="btn-nav cursor-pointer px-2 py-1 active">Editor</a>
-          <a class="btn-nav cursor-pointer px-2 py-1" (click)="openToast()">Diff-Checker</a>
+          <a 
+            class="btn-nav cursor-pointer px-2 py-1 active"
+            [ngClass]="{'active': selectedTab == 'editor'}"
+            (click)="selectedTab='editor'"
+          >
+            Editor
+          </a>
+          <a 
+            class="btn-nav cursor-pointer px-2 py-1"
+            [ngClass]="{'active': selectedTab == 'diff-checker'}"
+            (click)="selectedTab='diff-checker'"
+          >
+            Diff-Checker
+          </a>
         </nav>
       </span>
 
@@ -216,4 +228,13 @@
 </ng-template>
 
 <!-- Router outlet for rendering views -->
-<router-outlet></router-outlet>
+<!-- <router-outlet></router-outlet> -->
+
+@switch (selectedTab) {
+  @case ('editor') {
+    <app-editor-view></app-editor-view>
+  }
+  @case ('diff-checker') {
+    <app-diff-checker-view></app-diff-checker-view>
+  }
+}
