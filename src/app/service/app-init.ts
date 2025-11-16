@@ -143,4 +143,9 @@ export class AppInit {
     this.modifiedCode = code;
     this.modifiedCodeSubject.next(code);
   }
+
+  resetApp() {
+    this._localStorageService.clear();
+    location.reload();
+  }
 }

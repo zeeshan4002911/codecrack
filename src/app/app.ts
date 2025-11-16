@@ -16,6 +16,7 @@ import { DiffCheckerView } from './diff-checker-view/diff-checker-view';
 })
 export class App implements OnInit, AfterViewInit, OnDestroy {
   private _destroy: Subject<boolean> = new Subject<boolean>();
+  public isMobile: boolean = false;
 
   selectedTab: string = 'editor';
   themeMode: string | undefined = 'light';
@@ -41,6 +42,8 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     this._appInit.selectedLanguage$.pipe(takeUntil(this._destroy)).subscribe((language: any) => {
       this.selectedLanguage = language;
     });
+
+    this.checkIfMobile();
   }
 
   ngOnInit(): void {
@@ -70,6 +73,12 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     if (toastElement) {
       this.bToast = new Toast(toastElement);
     }
+
+    this.checkIfMobile();
+  }
+
+  private checkIfMobile() {
+    this.isMobile = window.innerWidth <= 768;
   }
 
   public setSelectedTab(tabName: string) {
@@ -117,6 +126,10 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     })
   }
 
+  public resetApp() {
+    this._appInit.resetApp();
+  }
+
   // Handler for Bootstrap Modal and Toast open
   openModal = () => (this.bModal) ? this.bModal.show() : null;
   openToast = () => (this.bToast) ? this.bToast.show() : null;
@@ -132,6 +145,11 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
         this.popoverInstance.hide();
       }
     }
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event): void {
+    this.checkIfMobile();
   }
 
   ngOnDestroy(): void {

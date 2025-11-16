@@ -18,4 +18,9 @@ export class LocalStorageService {
     this._localStorage[key] = value;
     localStorage.setItem('codecrack', JSON.stringify(this._localStorage));
   }
+
+  clear() {
+    this._localStorage = {};
+    localStorage.removeItem('codecrack');
+  }
 }
