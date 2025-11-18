@@ -27,7 +27,7 @@ export class EditorView implements AfterViewInit, OnDestroy {
         // monaco.editor.setTheme(isHighContrast && isDarkMode ? 'hc-black' : 'hc-light');
       }
     });
-    
+
     // Subscription for language change
     this._appInit.selectedLanguage$.pipe(takeUntil(this._destroy)).subscribe((language: any) => {
       this._appInit.editorOptions.language = language['id'];
@@ -60,12 +60,8 @@ export class EditorView implements AfterViewInit, OnDestroy {
           this.editorInstance.trigger('undo-button', 'redo', null);
           break;
         case "font-up":
-          const currFS_1 = this.editorInstance.getRawOptions().fontSize ?? 14;
-          this.editorInstance.updateOptions({ fontSize: currFS_1 + 2 });
-          break;
         case "font-down":
-          const currFS_2 = this.editorInstance.getRawOptions().fontSize ?? 14;
-          this.editorInstance.updateOptions({ fontSize: Math.max(6, currFS_2 - 2) });
+          this.editorInstance.updateOptions({ fontSize: this._appInit.editorOptions.fontSize });
           break;
         case "clear-all":
           // Triggering undo stack and executing edit to empty editor
@@ -95,7 +91,6 @@ export class EditorView implements AfterViewInit, OnDestroy {
           }
           break;
         case "word-wrap-toggle":
-          this._appInit.editorOptions.wordWrap = !this._appInit.editorOptions.wordWrap;
           this.editorInstance.updateOptions({
             wordWrap: this._appInit.editorOptions.wordWrap ? 'on' : 'off'
           })
@@ -113,7 +108,8 @@ export class EditorView implements AfterViewInit, OnDestroy {
       automaticLayout: this._appInit.editorOptions.automaticLayout,
       scrollBeyondLastLine: this._appInit.editorOptions.scrollBeyondLastLine,
       wordWrap: this._appInit.editorOptions.wordWrap ? 'on' : 'off',
-      theme: this._appInit.editorOptions.theme
+      theme: this._appInit.editorOptions.theme,
+      fontSize: this._appInit.editorOptions.fontSize
     });
 
     // Listening for the changes in editor and update it

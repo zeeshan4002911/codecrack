@@ -11,6 +11,12 @@ export class AppInit {
   constructor(
     private _localStorageService: LocalStorageService
   ) {
+    // Set EditorOption from localStorage if it exists
+    const cachedEditorOptions = this._localStorageService.get('editorOptions');
+    if (cachedEditorOptions) {
+      this.editorOptions = cachedEditorOptions;
+    }
+
     // Select tab from localStorage if it exists else editor as default
     this.selectedTab = this._localStorageService.get('selectedTab') ?? 'editor';
 
@@ -101,7 +107,20 @@ export class AppInit {
   appAction$ = this.appActionSubject.asObservable();
 
   dispatchAction(actionName: string) {
+    // Update the values in editor option and pushed to local storage
+    switch (actionName) {
+      case "font-up":
+        this.editorOptions.fontSize += 2;
+        break;
+      case "font-down":
+        this.editorOptions.fontSize = Math.max(6, this.editorOptions.fontSize - 2);
+        break;
+      case "word-wrap-toggle":
+        this.editorOptions.wordWrap = !this.editorOptions.wordWrap;
+        break;
+    }
     this.appActionSubject.next(actionName);
+    this._localStorageService.set('editorOptions', this.editorOptions);
   }
 
   /* Persistency of selected Tab, default to editor view */
@@ -117,7 +136,8 @@ export class AppInit {
     language: 'javascript',
     automaticLayout: true,
     scrollBeyondLastLine: true,
-    wordWrap: true // For toggling the word wrap 'on' & 'off'
+    wordWrap: true, // For toggling the word wrap 'on' & 'off'
+    fontSize: 14
   };
 
   /* Storage for code entered on the editor and diff checker by user */

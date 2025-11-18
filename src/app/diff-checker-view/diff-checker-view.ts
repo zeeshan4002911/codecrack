@@ -70,22 +70,12 @@ export class DiffCheckerView implements AfterViewInit, OnDestroy {
           this.diffEditorInstance.trigger('undo-button', 'redo', null);
           break;
         case "font-up":
+        case "font-down":
           const originalEditor_fu = this.diffEditorInstance.getOriginalEditor();
-          const currFS_f1 = originalEditor_fu.getRawOptions().fontSize ?? 14;
-          originalEditor_fu.updateOptions({ fontSize: currFS_f1 + 2 });
+          originalEditor_fu.updateOptions({ fontSize: this._appInit.editorOptions.fontSize });
 
           const modifiedEditor_fu = this.diffEditorInstance.getModifiedEditor();
-          const currFS_m1 = modifiedEditor_fu.getRawOptions().fontSize ?? 14;
-          modifiedEditor_fu.updateOptions({ fontSize: currFS_m1 + 2 });
-          break;
-        case "font-down":
-          const originalEditor_fd = this.diffEditorInstance.getOriginalEditor();
-          const currFS_f2 = originalEditor_fd.getRawOptions().fontSize ?? 14;
-          originalEditor_fd.updateOptions({ fontSize: Math.max(6, currFS_f2 - 2) });
-
-          const modifiedEditor_fd = this.diffEditorInstance.getModifiedEditor();
-          const currFS_m2 = modifiedEditor_fd.getRawOptions().fontSize ?? 14;
-          modifiedEditor_fd.updateOptions({ fontSize: Math.max(6, currFS_m2 - 2) });
+          modifiedEditor_fu.updateOptions({ fontSize: this._appInit.editorOptions.fontSize });
           break;
         case "clear-all":
           // Triggering undo stack and executing edit to empty editor
@@ -146,7 +136,6 @@ export class DiffCheckerView implements AfterViewInit, OnDestroy {
           }
           break;
         case "word-wrap-toggle":
-          this._appInit.editorOptions.wordWrap = !this._appInit.editorOptions.wordWrap;
           this.diffEditorInstance.updateOptions({
             wordWrap: this._appInit.editorOptions.wordWrap ? 'on' : 'off'
           })
@@ -166,7 +155,8 @@ export class DiffCheckerView implements AfterViewInit, OnDestroy {
       automaticLayout: this._appInit.editorOptions.automaticLayout,
       scrollBeyondLastLine: this._appInit.editorOptions.scrollBeyondLastLine,
       wordWrap: this._appInit.editorOptions.wordWrap ? 'on' : 'off',
-      theme: this._appInit.editorOptions.theme
+      theme: this._appInit.editorOptions.theme,
+      fontSize: this._appInit.editorOptions.fontSize
     });
     const originalModel = monaco.editor.createModel(this._appInit.originalCode, this._appInit.editorOptions.language);
     const modifiedModel = monaco.editor.createModel(this._appInit.modifiedCode, this._appInit.editorOptions.language);
