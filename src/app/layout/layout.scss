@@ -4,9 +4,6 @@
   }
 
   .btn-theme {
-    border-radius: 100%;
-    transform: scale(0.8);
-
     &-light {
       background-color: white !important;
       color: #343a40 !important;
@@ -16,6 +13,11 @@
       color: white !important;
       background-color: #343a40 !important;
     }
+  }
+
+  .btn-theme-circle {
+    border-radius: 100%;
+    transform: scale(0.8);
   }
 
   .btn-nav {

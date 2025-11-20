@@ -32,6 +32,11 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('popoverContent', { static: false }) popoverContent!: TemplateRef<any>;
 
   private bModal: any;
+  bModalMeta = {
+    message: "This is a modal view",
+    primary_btn_txt: "Confirm",
+    secondary_btn_txt: "Close"
+  };
   private bToast: any;
 
   constructor(
@@ -80,6 +85,15 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     const modalElement = document.getElementById('bModal');
     if (modalElement) {
       this.bModal = new Modal(modalElement);
+      const primaryBtn = modalElement.querySelector('#primary-btn');
+      const secondaryBtn = modalElement.querySelector('#secondary-btn');
+
+      if (primaryBtn) {
+        primaryBtn.addEventListener('click', () => this.bModalPrimaryBtnClickHandler());
+      }
+      if (secondaryBtn) {
+        secondaryBtn.addEventListener('click', () => this.bModalSecondaryBtnClickHandler());
+      }
     }
 
     // Initialize Bootstrap Toast
@@ -144,6 +158,17 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     this._appInit.resetApp();
   }
 
+  public codeShareHandler(action: string) {
+    if (action == 'pull-code') {
+      this.bModalMeta['message'] = `This will pull the code from "${this.codeShareId}",
+      and replace the current version of code. Would you like to continue?`;
+    } else if (action == 'push-code') {
+      this.bModalMeta['message'] = `This will push the code to "${this.codeShareId}",
+      and replace the earlier version of code. Would you like to continue?`;
+    }
+    this.bModal.show();
+  }
+
   // Handler for Bootstrap Modal and Toast open
   openModal = () => (this.bModal) ? this.bModal.show() : null;
   openToast = () => (this.bToast) ? this.bToast.show() : null;
@@ -164,6 +189,19 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   @HostListener('window:resize', ['$event'])
   onResize(event: Event): void {
     this.checkIfMobile();
+  }
+
+  bModalPrimaryBtnClickHandler() {
+    // Closing the opened modal
+    if (this.bModal) {
+      this.bModal.hide();
+    }
+
+    // TODO - Logic for push and pull of code
+  }
+
+  bModalSecondaryBtnClickHandler() {
+
   }
 
   ngOnDestroy(): void {
