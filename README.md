@@ -8,7 +8,9 @@ A lightweight, web-based mini IDE built on top of Monaco Editor. This app provid
 
 - Code Formatter: Automatically formats your code to follow standard conventions, ensuring consistency and readability.
 
-- Diff Checker: Compare different versions of your code or compare two files to identify differences with an easy-to-read side-by-side diff viewer. (Coming soon)
+- Diff Checker: Compare different versions of your code or compare two files to identify differences with an easy-to-read side-by-side diff viewer.
+
+- Code Share: URL based code share support by push and pull of code to cloudflare database, with local storage persistency for code and user preferences cache.
 
 ## Future Scope
 
@@ -18,12 +20,14 @@ The application planned future enhancements include:
 
 - Compiler Integration: Support for compiling code directly from the app, allowing you to run and test your code in various programming languages.
 
+- Whiteboard module
+
 ## Getting Started
 ### Prerequisites
 
 * A modern web browser (Chrome, Firefox, or Safari)
 
-* Basic knowledge of the programming language you are using
+* Basic knowledge of the programming front-end languages
 
 ### Installation
 
