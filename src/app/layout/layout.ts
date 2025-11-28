@@ -34,6 +34,7 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   private bModal: any;
   bModalMeta = {
     message: "This is a modal view",
+    context: "",
     primary_btn_txt: "Confirm",
     secondary_btn_txt: "Close"
   };
@@ -166,6 +167,7 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
       this.bModalMeta['message'] = `This will push the code to "${this.codeShareId}",
       and replace the earlier version of code. Would you like to continue?`;
     }
+    this.bModalMeta['context'] = action;
     this.bModal.show();
   }
 
@@ -197,7 +199,12 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
       this.bModal.hide();
     }
 
-    // TODO - Logic for push and pull of code
+    // Handler invocation for push and pull of code to cloud
+    if (this.bModalMeta['context'] == "pull-code") {
+      this._appInit.getCloudData(this.codeShareId);
+    } else if (this.bModalMeta['context'] == "push-code") {
+      this._appInit.setCloudData(this.codeShareId);
+    }
   }
 
   bModalSecondaryBtnClickHandler() {

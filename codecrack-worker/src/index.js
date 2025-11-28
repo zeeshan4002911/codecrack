@@ -48,6 +48,13 @@ export default {
 		response.body.timestamp = new Date().toISOString();
 		response.body.processingTimeMs = Date.now() - startTime;
 
+		// For these status code the response body should not be there
+		if ([101, 204, 205, 304].includes(response.status))
+			return new Response(null, {
+				status: 204,
+				headers: headers
+			});
+
 		return Response.json(response.body, {
 			status: response.status,
 			statusText: response.success ? "SUCCESS" : "FAILED",
@@ -57,20 +64,18 @@ export default {
 };
 
 async function pushCode(request, env, ctx) {
-	const {
-		codeshare_id,
-		created_date,
-		updated_date,
-		editor_code,
-		original_code,
-		modified_code,
-		theme_mode,
-		selected_language,
-		editor_options
+	let {
+		codeShareId,
+		editorCode,
+		originalCode,
+		modifiedCode,
+		themeMode,
+		selectedLanguage,
+		editorOptions
 	} = await request.json();
 
 	const result = await env.codecrackD1.prepare(`
-		INSERT INTO codecrack_code_store (
+		INSERT OR REPLACE INTO codecrack_code_store (
 			codeshare_id, 
 			created_date, 
 			updated_date,
@@ -81,17 +86,17 @@ async function pushCode(request, env, ctx) {
 			selected_language,
 			editor_options
 		)
-		VALUES (?, ?, ?, ?)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`).bind(
-		codeshare_id,
-		created_date,
-		updated_date,
-		editor_code,
-		original_code,
-		modified_code,
-		theme_mode,
-		selected_language,
-		editor_options
+		codeShareId,
+		null,
+		Date.now(),
+		editorCode ?? null,
+		originalCode ?? null,
+		modifiedCode ?? null,
+		themeMode ?? null,
+		selectedLanguage ?? null,
+		editorOptions ?? null
 	).run();
 
 	if (result.success) {

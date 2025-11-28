@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, debounceTime, Subject } from 'rxjs';
 import * as monaco from 'monaco-editor';
 import { LocalStorageService } from './local-storage-service';
+import { CloudStorageService } from './cloud-storage-service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,8 @@ import { LocalStorageService } from './local-storage-service';
 export class AppInit {
 
   constructor(
-    private _localStorageService: LocalStorageService
+    private _localStorageService: LocalStorageService,
+    private _cloudStorageService: CloudStorageService
   ) {
     // Set EditorOption from localStorage if it exists
     const cachedEditorOptions = this._localStorageService.get('editorOptions');
@@ -167,5 +169,41 @@ export class AppInit {
   resetApp() {
     this._localStorageService.clear();
     location.reload();
+  }
+
+  getCloudData(codeShareId: string) {
+    this._cloudStorageService.pullCodeHandler(codeShareId).subscribe(
+      (response) => {
+        console.log("Response:", response);
+      },
+      (error) => {
+        console.log("Error:", error);
+      },
+      () => {
+        // Post successful response
+      }
+    ).add(
+      () => {
+        // TODO - Toaster trigger
+      }
+    )
+  }
+
+  setCloudData(codeShareId: string) {
+    let payload = structuredClone(this._localStorageService.getAll());
+    payload['codeShareId'] = codeShareId;
+
+    this._cloudStorageService.pushCodeHandler(payload).subscribe(
+      (response) => {
+        console.log("Response:", response);
+      },
+      (error) => {
+        console.log("Error:", error);
+      }
+    ).add(
+      () => {
+        // TODO - Toaster trigger
+      }
+    )
   }
 }
