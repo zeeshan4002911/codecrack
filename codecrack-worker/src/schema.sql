@@ -1,14 +1,15 @@
+DROP TABLE IF EXISTS codecrack_code_store;
+
 CREATE TABLE codecrack_code_store (
-    "id" integer primary key,
-    "codeshare_id" integer,
-    "created_date" text,
-    "updated_date" text,
-    "editor_code" text,
-    "original_code" text,
-    "modified_code" text,
-    "theme_mode" text,
-    "selected_language" text,
-    "editor_options" text
+    "codeshare_id" TEXT PRIMARY KEY,
+    "created_date" TIMESTAMP,
+    "updated_date" TIMESTAMP,
+    "editor_code" TEXT,
+    "original_code" TEXT,
+    "modified_code" TEXT,
+    "theme_mode" TEXT,
+    "selected_language" TEXT,
+    "editor_options" TEXT
 );
 
 /*
