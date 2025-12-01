@@ -184,8 +184,8 @@ export class AppInit {
   }
 
   getCloudData() {
-    this._cloudStorageService.pullCodeHandler(this.codeShareId).subscribe(
-      (response) => {
+    this._cloudStorageService.pullCodeHandler(this.codeShareId).subscribe({
+      next: (response) => {
         console.log("Response:", response);
         if (response['data'] && response['data']['codeshare_id'] == this.codeShareId) {
           const newData: any = {};
@@ -202,13 +202,14 @@ export class AppInit {
           }
           this.setAppParameters(newData);
         } else {
-          console.log("Response error", response);
+          console.error("Response error", response);
         }
       },
-      (error) => {
-        console.log("Error:", error);
-      }
-    )
+      error: (error) => {
+        console.error("Error:", error);
+      },
+      complete: () => { }
+    })
   }
 
   setCloudData() {
@@ -217,14 +218,15 @@ export class AppInit {
     payload['editorOptions'] = JSON.stringify(payload['editorOptions']);
     payload['selectedLanguage'] = JSON.stringify(payload['selectedLanguage']);
 
-    this._cloudStorageService.pushCodeHandler(payload).subscribe(
-      (response) => {
+    this._cloudStorageService.pushCodeHandler(payload).subscribe({
+      next: (response) => {
         console.log("Response:", response);
       },
-      (error) => {
-        console.log("Error:", error);
-      }
-    )
+      error: (error) => {
+        console.error("Error:", error);
+      },
+      complete: () => { }
+    })
   }
 
   setAppParameters(newData: {}) {
