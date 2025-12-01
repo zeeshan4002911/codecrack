@@ -37,11 +37,12 @@ export class EditorView implements AfterViewInit, OnDestroy {
     });
 
     // Subscription for more option action resolver
-    this._appInit.appAction$.pipe(takeUntil(this._destroy)).subscribe((action) => {
+    this._appInit.appAction$.pipe(takeUntil(this._destroy)).subscribe((data: any) => {
       if (!this.editorInstance) {
         console.error("Editor doesn't exists to perform action");
         return;
       }
+      const { action, paylod } = data;
       switch (action) {
         case "format-code":
           this.editorInstance.getAction('editor.action.formatDocument')?.run();

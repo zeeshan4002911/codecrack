@@ -124,9 +124,10 @@ export class AppInit {
   private appActionSubject = new Subject();
   appAction$ = this.appActionSubject.asObservable();
 
-  dispatchAction(actionName: string) {
+  dispatchAction(action: string, payload = {}) {
+    let editorOptionUpdate = true
     // Update the values in editor option and pushed to local storage
-    switch (actionName) {
+    switch (action) {
       case "font-up":
         this.editorOptions.fontSize += 2;
         break;
@@ -136,9 +137,12 @@ export class AppInit {
       case "word-wrap-toggle":
         this.editorOptions.wordWrap = !this.editorOptions.wordWrap;
         break;
+      default:
+        editorOptionUpdate = false;
     }
-    this.appActionSubject.next(actionName);
-    this._localStorageService.set('editorOptions', this.editorOptions);
+    this.appActionSubject.next({ action, payload });
+    if (editorOptionUpdate)
+      this._localStorageService.set('editorOptions', this.editorOptions);
   }
 
   /* Persistency of selected Tab, default to editor view */
@@ -201,12 +205,32 @@ export class AppInit {
             }
           }
           this.setAppParameters(newData);
+          this.dispatchAction("bToast", {
+            "type": "success",
+            "message": response['message']
+          });
         } else {
           console.error("Response error", response);
+          this.dispatchAction("bToast", {
+            "type": "error",
+            "message": "Response format error"
+          });
         }
       },
       error: (error) => {
         console.error("Error:", error);
+
+        let ToastType = "error";
+        let ToastMsg = "Unknown Error";
+        if (error.status == 404) {
+          ToastType = "warning";
+          ToastMsg = error?.error?.message;
+        }
+
+        this.dispatchAction("bToast", {
+          "type": ToastType,
+          "message": ToastMsg
+        });
       },
       complete: () => { }
     })
@@ -221,9 +245,24 @@ export class AppInit {
     this._cloudStorageService.pushCodeHandler(payload).subscribe({
       next: (response) => {
         console.log("Response:", response);
+        this.dispatchAction("bToast", {
+          "type": "success",
+          "message": response['message']
+        });
       },
       error: (error) => {
         console.error("Error:", error);
+
+        let ToastType = "error";
+        let ToastMsg = "Unknown Error";
+        if (error.status == 500) {
+          ToastMsg = error?.error?.message;
+        }
+
+        this.dispatchAction("bToast", {
+          "type": ToastType,
+          "message": ToastMsg
+        });
       },
       complete: () => { }
     })

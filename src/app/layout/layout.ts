@@ -38,18 +38,35 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     secondary_btn_txt: "Close"
   };
   private bToast: any;
+  bToastMeta = {
+    type: "",
+    message: "This is a sample toast",
+  }
 
   constructor(
     private _appInit: AppInit,
     private _route: ActivatedRoute,
     private _router: Router
   ) {
+    // Subscription for theme mode (light or dark) change to trigger layout theme update
     this._appInit.themeMode$.pipe(takeUntil(this._destroy)).subscribe((val: string) => {
       this.themeMode = val;
       this.bodyTagThemeUpdateHandler();
     });
+
+    // Subscription for language change to reflect in layout
     this._appInit.selectedLanguage$.pipe(takeUntil(this._destroy)).subscribe((language: any) => {
       this.selectedLanguage = language;
+    });
+
+
+    this._appInit.appAction$.pipe(takeUntil(this._destroy)).subscribe((data: any) => {
+      const { action, payload } = data;
+      if (action == "bToast") {
+        this.bToastMeta['type'] = payload['type']
+        this.bToastMeta['message'] = payload['message'];
+        this.bToast.show();
+      }
     });
 
     this.checkIfMobile();

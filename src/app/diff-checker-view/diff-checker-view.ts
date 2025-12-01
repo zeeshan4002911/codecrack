@@ -38,11 +38,12 @@ export class DiffCheckerView implements AfterViewInit, OnDestroy {
     });
 
     // Subscription for more option action resolver
-    this._appInit.appAction$.pipe(takeUntil(this._destroy)).subscribe((action) => {
+    this._appInit.appAction$.pipe(takeUntil(this._destroy)).subscribe((data: any) => {
       if (!this.diffEditorInstance) {
         console.error("Diff Checker doesn't exists to perform action");
         return;
       }
+      const { action, paylod } = data;
       switch (action) {
         case "format-code":
           this.diffEditorInstance.getOriginalEditor().getAction('editor.action.formatDocument')?.run();
