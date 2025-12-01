@@ -99,6 +99,19 @@ export class EditorView implements AfterViewInit, OnDestroy {
           console.warn("No such action exists", action);
       }
     });
+
+    // Subscribe for update of editor options and code
+    this._appInit.editorUpdate$.pipe(takeUntil(this._destroy)).subscribe(() => {
+      if (this.editorInstance) {
+        this.editorInstance.updateOptions({
+          automaticLayout: this._appInit.editorOptions.automaticLayout,
+          scrollBeyondLastLine: this._appInit.editorOptions.scrollBeyondLastLine,
+          wordWrap: this._appInit.editorOptions.wordWrap ? 'on' : 'off',
+          fontSize: this._appInit.editorOptions.fontSize
+        });
+        this.editorInstance.setValue(this._appInit.editorCode);
+      }
+    });
   }
 
   ngAfterViewInit(): void {

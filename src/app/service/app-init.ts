@@ -3,11 +3,38 @@ import { BehaviorSubject, debounceTime, Subject } from 'rxjs';
 import * as monaco from 'monaco-editor';
 import { LocalStorageService } from './local-storage-service';
 import { CloudStorageService } from './cloud-storage-service';
+import * as humps from 'humps';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppInit {
+  codeShareId: string = "";
+
+  // Check browser preferred theme based on user's browser setting
+  prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  // Application parameters default values
+  defaultData = {
+    editorOptions: {
+      theme: 'vs',
+      language: 'javascript',
+      automaticLayout: true,
+      scrollBeyondLastLine: true,
+      wordWrap: true, // For toggling the word wrap 'on' & 'off'
+      fontSize: 14
+    },
+    selectedTab: "editor",
+    themeMode: (this.prefersDarkMode) ? "dark" : "light",
+    selectedLanguage: {
+      "id": "javascript",
+      "aliases": [
+        "JavaScript"
+      ]
+    },
+    editorCode: 'function x() {\n\tconsole.log("Hello world 😺!");\n}',
+    originalCode: 'function x() {\n\tconsole.log("Hello world from left 😺!");\n}',
+    modifiedCode: 'function x() {\n\tconsole.log("Hello world from right 😺!");\n}',
+  };
 
   constructor(
     private _localStorageService: LocalStorageService,
@@ -20,7 +47,7 @@ export class AppInit {
     }
 
     // Select tab from localStorage if it exists else editor as default
-    this.selectedTab = this._localStorageService.get('selectedTab') ?? 'editor';
+    this.selectedTab = this._localStorageService.get('selectedTab') ?? this.defaultData['selectedTab'];
 
     // Select theme from localStorage if it exists
     const cachedheme = this._localStorageService.get('themeMode');
@@ -31,8 +58,7 @@ export class AppInit {
     // Select language from localStorage if it exists 
     const cachedLanguage = this._localStorageService.get('selectedLanguage');
     if (cachedLanguage) {
-      this.selectedLanguage = cachedLanguage;
-      this.selectedLanguageSubject.next(this.selectedLanguage);
+      this.selectedLanguageSubject.next(cachedLanguage);
     };
 
     this.languages = monaco.languages.getLanguages();
@@ -76,11 +102,7 @@ export class AppInit {
   }
 
   /* Theme variables, logic and persistency */
-  // Check browser preferred theme based on user's browser setting
-  prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  private themeModeSubject = new BehaviorSubject<string>(
-    (this.prefersDarkMode) ? "dark" : "light"
-  );
+  private themeModeSubject = new BehaviorSubject<string>(this.defaultData['themeMode']);
   themeMode$ = this.themeModeSubject.asObservable();
 
   toggleThemeMode(newValue: string) {
@@ -90,13 +112,7 @@ export class AppInit {
 
   /* Language dropdown variables and methods */
   languages: any = [];
-  selectedLanguage = {
-    "id": "javascript",
-    "aliases": [
-      "JavaScript"
-    ]
-  };
-  private selectedLanguageSubject = new BehaviorSubject<any>(this.selectedLanguage);
+  private selectedLanguageSubject = new BehaviorSubject<any>(this.defaultData['selectedLanguage']);
   selectedLanguage$ = this.selectedLanguageSubject.asObservable();
 
   setEditorLanguage(language: any) {
@@ -126,26 +142,22 @@ export class AppInit {
   }
 
   /* Persistency of selected Tab, default to editor view */
-  selectedTab = 'editor';
+  selectedTab = this.defaultData['selectedTab'];
   setSelectedTab(tabName: string) {
     this.selectedTab = tabName;
     this._localStorageService.set('selectedTab', tabName);
   }
 
   /* Default editor Option, gets overwritten on run time */
-  editorOptions = {
-    theme: 'vs',
-    language: 'javascript',
-    automaticLayout: true,
-    scrollBeyondLastLine: true,
-    wordWrap: true, // For toggling the word wrap 'on' & 'off'
-    fontSize: 14
-  };
+  editorOptions = this.defaultData['editorOptions'];
+  private editorUpdateSubject = new BehaviorSubject(null);
+  // private editorUpdateSubject = new BehaviorSubject<{}>({});
+  editorUpdate$ = this.editorUpdateSubject.asObservable();
 
   /* Storage for code entered on the editor and diff checker by user */
-  editorCode: string = 'function x() {\n\tconsole.log("Hello world 😺!");\n}';
-  originalCode: string = 'function x() {\n\tconsole.log("Hello world from left 😺!");\n}';
-  modifiedCode: string = 'function x() {\n\tconsole.log("Hello world from right 😺!");\n}';
+  editorCode: string = this.defaultData['editorCode'];
+  originalCode: string = this.defaultData['originalCode'];
+  modifiedCode: string = this.defaultData['modifiedCode'];
 
   private editorCodeSubject = new Subject<string>();
   private originalCodeSubject = new Subject<string>();
@@ -171,27 +183,39 @@ export class AppInit {
     location.reload();
   }
 
-  getCloudData(codeShareId: string) {
-    this._cloudStorageService.pullCodeHandler(codeShareId).subscribe(
+  getCloudData() {
+    this._cloudStorageService.pullCodeHandler(this.codeShareId).subscribe(
       (response) => {
         console.log("Response:", response);
+        if (response['data'] && response['data']['codeshare_id'] == this.codeShareId) {
+          const newData: any = {};
+          const resData = response['data'];
+          for (let key in resData) {
+            if (resData[key]) {
+              // Convert underscore case to camel case using humps
+              const camelCaseKey = humps.camelize(key);
+              newData[camelCaseKey] = resData[key];
+              if (['editorOptions', 'selectedLanguage'].includes(camelCaseKey)) {
+                newData[camelCaseKey] = JSON.parse(newData[camelCaseKey]);
+              }
+            }
+          }
+          this.setAppParameters(newData);
+        } else {
+          console.log("Response error", response);
+        }
       },
       (error) => {
         console.log("Error:", error);
-      },
-      () => {
-        // Post successful response
-      }
-    ).add(
-      () => {
-        // TODO - Toaster trigger
       }
     )
   }
 
-  setCloudData(codeShareId: string) {
+  setCloudData() {
     let payload = structuredClone(this._localStorageService.getAll());
-    payload['codeShareId'] = codeShareId;
+    payload['codeShareId'] = this.codeShareId;
+    payload['editorOptions'] = JSON.stringify(payload['editorOptions']);
+    payload['selectedLanguage'] = JSON.stringify(payload['selectedLanguage']);
 
     this._cloudStorageService.pushCodeHandler(payload).subscribe(
       (response) => {
@@ -200,10 +224,23 @@ export class AppInit {
       (error) => {
         console.log("Error:", error);
       }
-    ).add(
-      () => {
-        // TODO - Toaster trigger
-      }
     )
+  }
+
+  setAppParameters(newData: {}) {
+    const appData = { ...this.defaultData, ...newData };
+
+    /* Setting all the parameters of application in state variables */
+    this.editorOptions = appData['editorOptions'];
+    this.selectedTab = appData['selectedTab'];
+    this.themeModeSubject.next(appData['themeMode']);
+    this.selectedLanguageSubject.next(appData['selectedLanguage']);
+    this.editorCode = appData['editorCode'];
+    this.originalCode = appData['originalCode'];
+    this.modifiedCode = appData['modifiedCode'];
+    this.editorUpdateSubject.next(null);
+
+    // Updating in local storage for cache
+    this._localStorageService.setAll(appData);
   }
 }

@@ -144,6 +144,26 @@ export class DiffCheckerView implements AfterViewInit, OnDestroy {
           console.warn("No such action exists", action);
       }
     });
+
+    // Subscription for update of diff editor option, original and modified view codes
+    this._appInit.editorUpdate$.pipe(takeUntil(this._destroy)).subscribe(() => {
+      if (this.diffEditorInstance) {
+        this.diffEditorInstance.updateOptions({
+          automaticLayout: this._appInit.editorOptions.automaticLayout,
+          scrollBeyondLastLine: this._appInit.editorOptions.scrollBeyondLastLine,
+          wordWrap: this._appInit.editorOptions.wordWrap ? 'on' : 'off',
+          fontSize: this._appInit.editorOptions.fontSize
+        });
+
+        const originalModel = monaco.editor.createModel(this._appInit.originalCode, this._appInit.editorOptions.language);
+        const modifiedModel = monaco.editor.createModel(this._appInit.modifiedCode, this._appInit.editorOptions.language);
+
+        this.diffEditorInstance.setModel({
+          original: originalModel,
+          modified: modifiedModel
+        });
+      }
+    });
   }
 
   ngAfterViewInit(): void {

@@ -19,12 +19,11 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   private _destroy: Subject<boolean> = new Subject<boolean>();
   public isMobile: boolean = false;
 
-  selectedTab: string = 'editor';
-  themeMode: string | undefined = 'light';
+  public selectedTab: string | undefined = 'editor';
+  public themeMode: string | undefined = 'light';
+  public selectedLanguage: any = {};
+  public searchLanguage: string = "";
   languages: any = [];
-  selectedLanguage: any = {};
-  searchLanguage: string = '';
-  codeShareId: string = '';
 
   // More Options popover variables
   popoverInstance!: Popover | undefined;
@@ -62,11 +61,11 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
 
     const codeShareId = this._route.snapshot.paramMap.get('codeShareId');
     if (codeShareId) {
-      this.codeShareId = codeShareId;
+      this._appInit.codeShareId = codeShareId;
     } else {
       // Generating new code share id
       const newCodeShareId = new Date().getTime();
-      this.codeShareId = String(newCodeShareId);
+      this._appInit.codeShareId = String(newCodeShareId);
       this._router.navigate([`${newCodeShareId}`]);
     }
   }
@@ -161,10 +160,10 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
 
   public codeShareHandler(action: string) {
     if (action == 'pull-code') {
-      this.bModalMeta['message'] = `This will pull the code from "${this.codeShareId}",
+      this.bModalMeta['message'] = `This will pull the code from "${this._appInit.codeShareId}",
       and replace the current version of code. Would you like to continue?`;
     } else if (action == 'push-code') {
-      this.bModalMeta['message'] = `This will push the code to "${this.codeShareId}",
+      this.bModalMeta['message'] = `This will push the code to "${this._appInit.codeShareId}",
       and replace the earlier version of code. Would you like to continue?`;
     }
     this.bModalMeta['context'] = action;
@@ -201,9 +200,9 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
 
     // Handler invocation for push and pull of code to cloud
     if (this.bModalMeta['context'] == "pull-code") {
-      this._appInit.getCloudData(this.codeShareId);
+      this._appInit.getCloudData();
     } else if (this.bModalMeta['context'] == "push-code") {
-      this._appInit.setCloudData(this.codeShareId);
+      this._appInit.setCloudData();
     }
   }
 
@@ -216,5 +215,9 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     this._destroy.complete();
     this.themeMode = undefined;
     this.popoverInstance = undefined;
+    this.selectedTab = undefined;
+    this.selectedLanguage = {};
+    this.searchLanguage = "";
+    this.languages = undefined;
   }
 }

@@ -23,6 +23,11 @@ export class LocalStorageService {
     localStorage.setItem('codecrack', JSON.stringify(this._localStorage));
   }
 
+  setAll(values: any) {
+    this._localStorage = values;
+    localStorage.setItem('codecrack', JSON.stringify(this._localStorage));
+  }
+
   clear() {
     this._localStorage = {};
     localStorage.removeItem('codecrack');
