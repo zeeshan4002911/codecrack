@@ -184,7 +184,8 @@ export class AppInit {
 
   resetApp() {
     this._localStorageService.clear();
-    location.reload();
+    // location.reload();
+    this.setAppParameters({});
   }
 
   getCloudData() {
