@@ -38,11 +38,12 @@ export class DiffCheckerView implements AfterViewInit, OnDestroy {
     });
 
     // Subscription for more option action resolver
-    this._appInit.appAction$.pipe(takeUntil(this._destroy)).subscribe((action) => {
+    this._appInit.appAction$.pipe(takeUntil(this._destroy)).subscribe((data: any) => {
       if (!this.diffEditorInstance) {
         console.error("Diff Checker doesn't exists to perform action");
         return;
       }
+      const { action, paylod } = data;
       switch (action) {
         case "format-code":
           this.diffEditorInstance.getOriginalEditor().getAction('editor.action.formatDocument')?.run();
@@ -142,6 +143,26 @@ export class DiffCheckerView implements AfterViewInit, OnDestroy {
           break;
         default:
           console.warn("No such action exists", action);
+      }
+    });
+
+    // Subscription for update of diff editor option, original and modified view codes
+    this._appInit.editorUpdate$.pipe(takeUntil(this._destroy)).subscribe(() => {
+      if (this.diffEditorInstance) {
+        this.diffEditorInstance.updateOptions({
+          automaticLayout: this._appInit.editorOptions.automaticLayout,
+          scrollBeyondLastLine: this._appInit.editorOptions.scrollBeyondLastLine,
+          wordWrap: this._appInit.editorOptions.wordWrap ? 'on' : 'off',
+          fontSize: this._appInit.editorOptions.fontSize
+        });
+
+        const originalModel = monaco.editor.createModel(this._appInit.originalCode, this._appInit.editorOptions.language);
+        const modifiedModel = monaco.editor.createModel(this._appInit.modifiedCode, this._appInit.editorOptions.language);
+
+        this.diffEditorInstance.setModel({
+          original: originalModel,
+          modified: modifiedModel
+        });
       }
     });
   }

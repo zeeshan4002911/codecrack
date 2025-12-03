@@ -37,11 +37,12 @@ export class EditorView implements AfterViewInit, OnDestroy {
     });
 
     // Subscription for more option action resolver
-    this._appInit.appAction$.pipe(takeUntil(this._destroy)).subscribe((action) => {
+    this._appInit.appAction$.pipe(takeUntil(this._destroy)).subscribe((data: any) => {
       if (!this.editorInstance) {
         console.error("Editor doesn't exists to perform action");
         return;
       }
+      const { action, paylod } = data;
       switch (action) {
         case "format-code":
           this.editorInstance.getAction('editor.action.formatDocument')?.run();
@@ -97,6 +98,19 @@ export class EditorView implements AfterViewInit, OnDestroy {
           break;
         default:
           console.warn("No such action exists", action);
+      }
+    });
+
+    // Subscribe for update of editor options and code
+    this._appInit.editorUpdate$.pipe(takeUntil(this._destroy)).subscribe(() => {
+      if (this.editorInstance) {
+        this.editorInstance.updateOptions({
+          automaticLayout: this._appInit.editorOptions.automaticLayout,
+          scrollBeyondLastLine: this._appInit.editorOptions.scrollBeyondLastLine,
+          wordWrap: this._appInit.editorOptions.wordWrap ? 'on' : 'off',
+          fontSize: this._appInit.editorOptions.fontSize
+        });
+        this.editorInstance.setValue(this._appInit.editorCode);
       }
     });
   }

@@ -2,14 +2,43 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, debounceTime, Subject } from 'rxjs';
 import * as monaco from 'monaco-editor';
 import { LocalStorageService } from './local-storage-service';
+import { CloudStorageService } from './cloud-storage-service';
+import * as humps from 'humps';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppInit {
+  codeShareId: string = "";
+
+  // Check browser preferred theme based on user's browser setting
+  prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  // Application parameters default values
+  defaultData = {
+    editorOptions: {
+      theme: 'vs',
+      language: 'javascript',
+      automaticLayout: true,
+      scrollBeyondLastLine: true,
+      wordWrap: true, // For toggling the word wrap 'on' & 'off'
+      fontSize: 14
+    },
+    selectedTab: "editor",
+    themeMode: (this.prefersDarkMode) ? "dark" : "light",
+    selectedLanguage: {
+      "id": "javascript",
+      "aliases": [
+        "JavaScript"
+      ]
+    },
+    editorCode: 'function x() {\n\tconsole.log("Hello world 😺!");\n}',
+    originalCode: 'function x() {\n\tconsole.log("Hello world from left 😺!");\n}',
+    modifiedCode: 'function x() {\n\tconsole.log("Hello world from right 😺!");\n}',
+  };
 
   constructor(
-    private _localStorageService: LocalStorageService
+    private _localStorageService: LocalStorageService,
+    private _cloudStorageService: CloudStorageService
   ) {
     // Set EditorOption from localStorage if it exists
     const cachedEditorOptions = this._localStorageService.get('editorOptions');
@@ -18,7 +47,7 @@ export class AppInit {
     }
 
     // Select tab from localStorage if it exists else editor as default
-    this.selectedTab = this._localStorageService.get('selectedTab') ?? 'editor';
+    this.selectedTab = this._localStorageService.get('selectedTab') ?? this.defaultData['selectedTab'];
 
     // Select theme from localStorage if it exists
     const cachedheme = this._localStorageService.get('themeMode');
@@ -29,8 +58,7 @@ export class AppInit {
     // Select language from localStorage if it exists 
     const cachedLanguage = this._localStorageService.get('selectedLanguage');
     if (cachedLanguage) {
-      this.selectedLanguage = cachedLanguage;
-      this.selectedLanguageSubject.next(this.selectedLanguage);
+      this.selectedLanguageSubject.next(cachedLanguage);
     };
 
     this.languages = monaco.languages.getLanguages();
@@ -74,11 +102,7 @@ export class AppInit {
   }
 
   /* Theme variables, logic and persistency */
-  // Check browser preferred theme based on user's browser setting
-  prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  private themeModeSubject = new BehaviorSubject<string>(
-    (this.prefersDarkMode) ? "dark" : "light"
-  );
+  private themeModeSubject = new BehaviorSubject<string>(this.defaultData['themeMode']);
   themeMode$ = this.themeModeSubject.asObservable();
 
   toggleThemeMode(newValue: string) {
@@ -88,13 +112,7 @@ export class AppInit {
 
   /* Language dropdown variables and methods */
   languages: any = [];
-  selectedLanguage = {
-    "id": "javascript",
-    "aliases": [
-      "JavaScript"
-    ]
-  };
-  private selectedLanguageSubject = new BehaviorSubject<any>(this.selectedLanguage);
+  private selectedLanguageSubject = new BehaviorSubject<any>(this.defaultData['selectedLanguage']);
   selectedLanguage$ = this.selectedLanguageSubject.asObservable();
 
   setEditorLanguage(language: any) {
@@ -106,9 +124,10 @@ export class AppInit {
   private appActionSubject = new Subject();
   appAction$ = this.appActionSubject.asObservable();
 
-  dispatchAction(actionName: string) {
+  dispatchAction(action: string, payload = {}) {
+    let editorOptionUpdate = true
     // Update the values in editor option and pushed to local storage
-    switch (actionName) {
+    switch (action) {
       case "font-up":
         this.editorOptions.fontSize += 2;
         break;
@@ -118,32 +137,31 @@ export class AppInit {
       case "word-wrap-toggle":
         this.editorOptions.wordWrap = !this.editorOptions.wordWrap;
         break;
+      default:
+        editorOptionUpdate = false;
     }
-    this.appActionSubject.next(actionName);
-    this._localStorageService.set('editorOptions', this.editorOptions);
+    this.appActionSubject.next({ action, payload });
+    if (editorOptionUpdate)
+      this._localStorageService.set('editorOptions', this.editorOptions);
   }
 
   /* Persistency of selected Tab, default to editor view */
-  selectedTab = 'editor';
+  selectedTab = this.defaultData['selectedTab'];
   setSelectedTab(tabName: string) {
     this.selectedTab = tabName;
     this._localStorageService.set('selectedTab', tabName);
   }
 
   /* Default editor Option, gets overwritten on run time */
-  editorOptions = {
-    theme: 'vs',
-    language: 'javascript',
-    automaticLayout: true,
-    scrollBeyondLastLine: true,
-    wordWrap: true, // For toggling the word wrap 'on' & 'off'
-    fontSize: 14
-  };
+  editorOptions = this.defaultData['editorOptions'];
+  private editorUpdateSubject = new BehaviorSubject(null);
+  // private editorUpdateSubject = new BehaviorSubject<{}>({});
+  editorUpdate$ = this.editorUpdateSubject.asObservable();
 
   /* Storage for code entered on the editor and diff checker by user */
-  editorCode: string = 'function x() {\n\tconsole.log("Hello world 😺!");\n}';
-  originalCode: string = 'function x() {\n\tconsole.log("Hello world from left 😺!");\n}';
-  modifiedCode: string = 'function x() {\n\tconsole.log("Hello world from right 😺!");\n}';
+  editorCode: string = this.defaultData['editorCode'];
+  originalCode: string = this.defaultData['originalCode'];
+  modifiedCode: string = this.defaultData['modifiedCode'];
 
   private editorCodeSubject = new Subject<string>();
   private originalCodeSubject = new Subject<string>();
@@ -166,6 +184,105 @@ export class AppInit {
 
   resetApp() {
     this._localStorageService.clear();
-    location.reload();
+    // location.reload();
+    this.setAppParameters({});
+  }
+
+  getCloudData() {
+    this._cloudStorageService.pullCodeHandler(this.codeShareId).subscribe({
+      next: (response) => {
+        console.log("Response:", response);
+        if (response['data'] && response['data']['codeshare_id'] == this.codeShareId) {
+          const newData: any = {};
+          const resData = response['data'];
+          for (let key in resData) {
+            if (resData[key]) {
+              // Convert underscore case to camel case using humps
+              const camelCaseKey = humps.camelize(key);
+              newData[camelCaseKey] = resData[key];
+              if (['editorOptions', 'selectedLanguage'].includes(camelCaseKey)) {
+                newData[camelCaseKey] = JSON.parse(newData[camelCaseKey]);
+              }
+            }
+          }
+          this.setAppParameters(newData);
+          this.dispatchAction("bToast", {
+            "type": "success",
+            "message": response['message']
+          });
+        } else {
+          console.error("Response error", response);
+          this.dispatchAction("bToast", {
+            "type": "error",
+            "message": "Response format error"
+          });
+        }
+      },
+      error: (error) => {
+        console.error("Error:", error);
+
+        let ToastType = "error";
+        let ToastMsg = "Unknown Error";
+        if (error.status == 404) {
+          ToastType = "warning";
+          ToastMsg = error?.error?.message;
+        }
+
+        this.dispatchAction("bToast", {
+          "type": ToastType,
+          "message": ToastMsg
+        });
+      },
+      complete: () => { }
+    })
+  }
+
+  setCloudData() {
+    let payload = structuredClone(this._localStorageService.getAll());
+    payload['codeShareId'] = this.codeShareId;
+    payload['editorOptions'] = JSON.stringify(payload['editorOptions']);
+    payload['selectedLanguage'] = JSON.stringify(payload['selectedLanguage']);
+
+    this._cloudStorageService.pushCodeHandler(payload).subscribe({
+      next: (response) => {
+        console.log("Response:", response);
+        this.dispatchAction("bToast", {
+          "type": "success",
+          "message": response['message']
+        });
+      },
+      error: (error) => {
+        console.error("Error:", error);
+
+        let ToastType = "error";
+        let ToastMsg = "Unknown Error";
+        if (error.status == 500) {
+          ToastMsg = error?.error?.message;
+        }
+
+        this.dispatchAction("bToast", {
+          "type": ToastType,
+          "message": ToastMsg
+        });
+      },
+      complete: () => { }
+    })
+  }
+
+  setAppParameters(newData: {}) {
+    const appData = { ...this.defaultData, ...newData };
+
+    /* Setting all the parameters of application in state variables */
+    this.editorOptions = appData['editorOptions'];
+    this.selectedTab = appData['selectedTab'];
+    this.themeModeSubject.next(appData['themeMode']);
+    this.selectedLanguageSubject.next(appData['selectedLanguage']);
+    this.editorCode = appData['editorCode'];
+    this.originalCode = appData['originalCode'];
+    this.modifiedCode = appData['modifiedCode'];
+    this.editorUpdateSubject.next(null);
+
+    // Updating in local storage for cache
+    this._localStorageService.setAll(appData);
   }
 }

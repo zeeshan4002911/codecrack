@@ -8,9 +8,6 @@
 }
 
 .btn-theme {
-    border-radius: 100%;
-    transform: scale(0.8);
-
     &-light {
         background-color: white !important;
         color: #343a40 !important;
@@ -20,7 +17,7 @@
         color: white !important;
         background-color: #343a40 !important;
     }
-    
+
     &-borderless {
         border: none;
 
@@ -33,9 +30,59 @@
         vertical-align: super;
         font-size: 0.5rem;
     }
+
+    &-circle {
+        border-radius: 100%;
+        transform: scale(0.8);
+    }
+
+    &-secondary {
+        &-light {
+            color: white !important;
+            background-color: #343a40 !important;
+            border: 1px solid white;
+        }
+
+        &-dark {
+            color: #343a40 !important;
+            background-color: white !important;
+            border: 1px solid #343a40;
+        }
+    }
 }
 
 /* Utility classes */
 .cursor-pointer {
     cursor: pointer;
+}
+
+@media only screen and (width > 576px) {
+    .w-sm {
+        &-25 {
+            width: 25% !important;
+        }
+        &-50 {
+            width: 50% !important;
+        }
+        &-75 {
+            width: 75% !important;
+        }
+        &-100 {
+            width: 100% !important;
+        }
+    }
+    .w-md {
+        &-25 {
+            width: 25% !important;
+        }
+        &-50 {
+            width: 50% !important;
+        }
+        &-75 {
+            width: 75% !important;
+        }
+        &-100 {
+            width: 100% !important;
+        }
+    }
 }

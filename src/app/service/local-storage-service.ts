@@ -14,8 +14,17 @@ export class LocalStorageService {
     return this._localStorage[key];
   }
 
+  getAll() {
+    return this._localStorage;
+  }
+
   set(key: string, value: any) {
     this._localStorage[key] = value;
+    localStorage.setItem('codecrack', JSON.stringify(this._localStorage));
+  }
+
+  setAll(values: any) {
+    this._localStorage = values;
     localStorage.setItem('codecrack', JSON.stringify(this._localStorage));
   }
 
