@@ -62,3 +62,13 @@ And then later Vite gets added for development, version 7.2.2 with @analogjs/vit
 > * First Production version
 > * Changes in build process
 > * JSON Compression feature
+
+##### 16 Nov, 2025
+> * Bug Fixes and Enhancements
+> * Diff Checker module Added
+> * Local Storage based persistency for code and preferences
+
+##### 03 Dec, 2025
+> * Code Share Module Added
+> * Added Cloudflare worker and D1 Storage for cloud storage based persistency
+> * Confirmation Dialogs and Alert Toaster Added
