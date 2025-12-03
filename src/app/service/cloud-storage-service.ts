@@ -6,8 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class CloudStorageService {
-  // TODO - Driven by env variable
-  private apiUrl = 'http://localhost:8787';
+  // Driven by env variable of vite
+  private apiUrl = import.meta.env.VITE_API_URL;
 
   constructor(
     private _https: HttpClient
