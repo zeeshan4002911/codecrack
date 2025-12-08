@@ -25,10 +25,13 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   public searchLanguage: string = "";
   languages: any = [];
 
-  // More Options popover variables
-  popoverInstance!: Popover | undefined;
-  @ViewChild('popoverBtn', { static: false }) popoverBtn!: ElementRef;
-  @ViewChild('popoverContent', { static: false }) popoverContent!: TemplateRef<any>;
+  // More Options and Code Share popover variables
+  moreOptionsPopoverInstance!: Popover | undefined;
+  @ViewChild('moreOptionsBtn', { static: false }) moreOptionsBtn!: ElementRef;
+  @ViewChild('moreOptionsContent', { static: false }) moreOptionsContent!: TemplateRef<any>;
+  codeSharePopoverInstance!: Popover | undefined;
+  @ViewChild('codeShareBtn', { static: false }) codeShareBtn!: ElementRef;
+  @ViewChild('codeShareContent', { static: false }) codeShareContent!: TemplateRef<any>;
 
   private bModal: any;
   bModalMeta = {
@@ -88,13 +91,23 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    const embeddedView = this.popoverContent.createEmbeddedView(null);
-    const popoverContentEl = embeddedView.rootNodes[0];
+    const embeddedView = this.moreOptionsContent.createEmbeddedView(null);
+    const moreOptionsContentEl = embeddedView.rootNodes[0];
 
     // Initialize Bootstrap Popover for More Options
-    this.popoverInstance = new Popover(this.popoverBtn.nativeElement, {
+    this.moreOptionsPopoverInstance = new Popover(this.moreOptionsBtn.nativeElement, {
       html: true,
-      content: popoverContentEl,
+      content: moreOptionsContentEl,
+      customClass: 'no-padding-popover'
+    });
+
+    // Initialize Bootstrap Popover for code share dialog
+    const codeShareEmbeddedView = this.codeShareContent.createEmbeddedView(null);
+    const codeShareContentEl = codeShareEmbeddedView.rootNodes[0];
+
+    this.codeSharePopoverInstance = new Popover(this.codeShareBtn.nativeElement, {
+      html: true,
+      content: codeShareContentEl,
       customClass: 'no-padding-popover'
     });
 
@@ -194,12 +207,21 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   // Hide popover once any any click happen outside the content of it
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
-    if (this.popoverInstance) {
+    if (this.moreOptionsPopoverInstance) {
       const targetElement = event.target as HTMLElement;
       const isInisdePopover = document.querySelector('.popover-content')?.contains(targetElement);
 
       if (!isInisdePopover) {
-        this.popoverInstance.hide();
+        this.moreOptionsPopoverInstance.hide();
+      }
+    }
+
+    if (this.codeSharePopoverInstance) {
+      const targetElement = event.target as HTMLElement;
+      const isInisdePopover = document.querySelector('.popover-content')?.contains(targetElement);
+
+      if (!isInisdePopover) {
+        this.codeSharePopoverInstance.hide();
       }
     }
   }
@@ -231,7 +253,8 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     this._destroy.next(false);
     this._destroy.complete();
     this.themeMode = undefined;
-    this.popoverInstance = undefined;
+    this.moreOptionsPopoverInstance = undefined;
+    this.codeSharePopoverInstance = undefined;
     this.selectedTab = undefined;
     this.selectedLanguage = {};
     this.searchLanguage = "";

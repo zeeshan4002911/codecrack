@@ -117,7 +117,21 @@
         </button>
 
         <button 
-          #popoverBtn
+          #codeShareBtn
+          type="button"
+          class="btn btn-theme btn-theme-circle py-1 px-2"
+          data-bs-toggle="popover"
+          data-bs-placement="bottom"
+        >
+          <i 
+            class="bi bi-share-fill"
+             data-bs-toggle="tooltip"
+            title="Code share"
+          ></i>
+        </button>
+
+        <button 
+          #moreOptionsBtn
           type="button" 
           class="btn btn-theme btn-theme-circle py-1 px-2"
           data-bs-toggle="popover" 
@@ -233,8 +247,14 @@
   </div>
 </div>
 
+<ng-template #codeShareContent>
+  <div class="popover-content d-flex flex-column">
+    Code Share
+  </div>
+</ng-template>
+
 <!-- More Option Feature Buttons -->
-<ng-template #popoverContent>
+<ng-template #moreOptionsContent>
   <div class="popover-content d-flex flex-column">
     <div class="d-flex justify-content-center">
       <button 
