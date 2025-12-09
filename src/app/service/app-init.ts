@@ -27,9 +27,9 @@ export class AppInit {
     themeMode: (this.prefersDarkMode) ? "dark" : "light",
     selectedLanguage: {
       "id": "javascript",
-      "aliases": [
-        "JavaScript"
-      ]
+      "extensions": [".js"],
+      "aliases": ["JavaScript"],
+      "mimetypes": ["text/javascript"]
     },
     editorCode: 'function x() {\n\tconsole.log("Hello world 😺!");\n}',
     originalCode: 'function x() {\n\tconsole.log("Hello world from left 😺!");\n}',
@@ -65,7 +65,9 @@ export class AppInit {
     // JSON Comparison as custom language
     this.languages.push({
       "id": "json-compression",
-      "aliases": ["JSON Compression"]
+      "extensions": [".json"],
+      "aliases": ["JSON Compression"],
+      "mimetypes": ["application/json"]
     });
 
     /* Set code from localStorage if it exists */
