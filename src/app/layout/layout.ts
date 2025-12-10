@@ -82,12 +82,20 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     this.selectedTab = this._appInit.selectedTab;
 
     const codeShareId = this._route.snapshot.paramMap.get('codeShareId');
-    if (codeShareId) {
-      this._appInit.codeShareId = codeShareId;
+    const cacheCodeShareId = this._appInit.getCodeShareId();
+
+    if (codeShareId && codeShareId != cacheCodeShareId) {
+      this._appInit.setCodeShareId(codeShareId);
+      this._appInit.getCloudData();
     } else {
-      // Generating new code share id
-      const newCodeShareId = new Date().getTime();
-      this._appInit.codeShareId = String(newCodeShareId);
+      let newCodeShareId = null;
+      if (cacheCodeShareId)
+        newCodeShareId = cacheCodeShareId;
+      else
+        // Generating new code share id
+        newCodeShareId = String(new Date().getTime());
+
+      this._appInit.setCodeShareId(newCodeShareId);
       this._router.navigate([`${newCodeShareId}`]);
     }
     this.codeShareURL = window.location.href;
@@ -246,10 +254,10 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   // Cloud push and pull of code
   public codeShareHandler(action: string) {
     if (action == 'pull-code') {
-      this.bModalMeta['message'] = `This will pull the code from "${this._appInit.codeShareId}",
+      this.bModalMeta['message'] = `This will pull the code from "${this._appInit.getCodeShareId()}",
       and replace the current version of code. Would you like to continue?`;
     } else if (action == 'push-code') {
-      this.bModalMeta['message'] = `This will push the code to "${this._appInit.codeShareId}",
+      this.bModalMeta['message'] = `This will push the code to "${this._appInit.getCodeShareId()}",
       and replace the earlier version of code. Would you like to continue?`;
     }
     if (this.codeSharePopoverInstance) this.codeSharePopoverInstance.hide();
@@ -304,7 +312,7 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     const extensions = this.selectedLanguage['extensions'] ?? ['.txt'];
     const fileAlias = this.selectedLanguage['aliases']?.[0] ?? 'Text';
     const mimeType = this.selectedLanguage['mimetypes']?.[0] ?? 'text/plain';
-    const fileName = 'codecrack-editor-' + this._appInit.codeShareId + extensions[0];
+    const fileName = 'codecrack-editor-' + this._appInit.getCodeShareId() + extensions[0];
     const acceptObj = { [mimeType]: extensions };
 
     if ('showSaveFilePicker' in window) {

@@ -9,7 +9,7 @@ import * as humps from 'humps';
   providedIn: 'root',
 })
 export class AppInit {
-  codeShareId: string = "";
+  private codeShareId: string = "";
 
   // Check browser preferred theme based on user's browser setting
   prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -101,6 +101,18 @@ export class AppInit {
     ).subscribe(code => {
       this._localStorageService.set('modifiedCode', code);
     });
+  }
+
+  getCodeShareId = () => {
+    let codeShareId = this.codeShareId;
+    if (!codeShareId)
+      codeShareId = this._localStorageService.get('codeshareId');
+    return codeShareId;
+  }
+
+  setCodeShareId(codeShareId: string) {
+    this.codeShareId = codeShareId;
+    this._localStorageService.set('codeshareId', this.codeShareId);
   }
 
   /* Theme variables, logic and persistency */
