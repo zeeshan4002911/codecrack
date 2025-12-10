@@ -123,6 +123,9 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
       content: codeShareContentEl,
       customClass: 'no-padding-popover'
     });
+    // Custom trigger of code share popover show and hide, to remove initial render
+    this.codeSharePopoverInstance.show();
+    this.codeSharePopoverInstance.hide();
 
     // Initialize Bootstrap Modal
     const modalElement = document.getElementById('bModal');
