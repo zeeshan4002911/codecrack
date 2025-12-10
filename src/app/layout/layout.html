@@ -30,6 +30,13 @@
             >
               Diff-Checker
             </a>
+            <a 
+              class="btn-nav cursor-pointer px-2 py-1"
+              [ngClass]="{'active': selectedTab == 'whiteboard'}"
+              (click)="setSelectedTab('whiteboard')"
+            >
+              Whiteboard
+            </a>
           </nav>
         }
       </span>
@@ -148,6 +155,22 @@
   </nav>
 </section>
 
+<!-- conditions for rendering different views without routing -->
+<div [style.height]="viewContainerHeight">
+  @switch (selectedTab) {
+    @case ('editor') {
+      <app-editor-view></app-editor-view>
+    }
+    @case ('diff-checker') {
+      <app-diff-checker-view></app-diff-checker-view>
+    }
+    @case ('whiteboard') {
+      <app-whiteboard-view class="h-100 d-block"></app-whiteboard-view>
+    }
+  }
+</div>
+
+<!-- Overlay navigation panel for mobile view -->
 <div 
   class="offcanvas offcanvas-start w-75 w-sm-50 w-md-25 h-100"
   tabindex="-1"
@@ -180,6 +203,14 @@
         data-bs-dismiss="offcanvas"
       >
         Diff-Checker
+      </a>
+      <a 
+        class="btn-nav cursor-pointer px-2 py-1"
+        [ngClass]="{'active': selectedTab == 'whiteboard'}"
+        (click)="setSelectedTab('whiteboard')"
+        data-bs-dismiss="offcanvas"
+      >
+        Whiteboard
       </a>
     </nav>
   </div>
@@ -247,6 +278,7 @@
   </div>
 </div>
 
+<!-- Code Share Popover content -->
 <ng-template #codeShareContent let-codeShareURL="codeShareURL" let-themeMode="themeMode">
   <div class="code-share-container popover-content d-flex flex-column">
     <div class="d-flex flex-column p-3">
@@ -391,13 +423,3 @@
     </div>
   </div>
 </ng-template>
-
-<!-- conditions for rendering different views without routing -->
-@switch (selectedTab) {
-  @case ('editor') {
-    <app-editor-view></app-editor-view>
-  }
-  @case ('diff-checker') {
-    <app-diff-checker-view></app-diff-checker-view>
-  }
-}

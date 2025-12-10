@@ -1,30 +1,31 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
-// import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AppInit } from '../service/app-init';
 import { Popover, Modal, Toast } from 'bootstrap';
 import { Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { EditorView } from '../editor-view/editor-view';
-import { DiffCheckerView } from '../diff-checker-view/diff-checker-view';
 import { ActivatedRoute, Router } from '@angular/router';
+import { EditorView } from '../components/editor-view/editor-view';
+import { DiffCheckerView } from '../components/diff-checker-view/diff-checker-view';
+import { WhiteboardView } from '../components/whiteboard-view/whiteboard-view';
 
 @Component({
   selector: 'app-layout',
-  imports: [CommonModule, FormsModule, EditorView, DiffCheckerView],
+  imports: [CommonModule, FormsModule, EditorView, DiffCheckerView, WhiteboardView],
   templateUrl: './layout.html',
   styleUrl: './layout.scss'
 })
 export class Layout implements OnInit, AfterViewInit, OnDestroy {
   private _destroy: Subject<boolean> = new Subject<boolean>();
   public isMobile: boolean = false;
+  public viewContainerHeight: string | undefined = "";
 
   public selectedTab: string | undefined = 'editor';
   public themeMode: string | undefined = 'light';
   public selectedLanguage: any = {};
   public searchLanguage: string = "";
   languages: any = [];
-  codeShareURL: string = "aaa";
+  codeShareURL: string = "";
 
   // More Options and Code Share popover variables
   moreOptionsPopoverInstance!: Popover | undefined;
@@ -148,7 +149,7 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
       this.bToast = new Toast(toastElement);
     }
 
-    this.checkIfMobile();
+    this.onResize(null);
   }
 
   private checkIfMobile() {
@@ -231,8 +232,11 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize(event: Event): void {
+  onResize(event: Event | null): void {
     this.checkIfMobile();
+
+    const appHeader = document.getElementById('app-header')?.offsetHeight ?? 0;
+    this.viewContainerHeight = `calc(100vh - ${appHeader}px)`;
   }
 
   bModalPrimaryBtnClickHandler() {
@@ -360,6 +364,7 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this._destroy.next(false);
     this._destroy.complete();
+    this.viewContainerHeight = undefined;
     this.themeMode = undefined;
     this.moreOptionsPopoverInstance = undefined;
     this.codeSharePopoverInstance = undefined;

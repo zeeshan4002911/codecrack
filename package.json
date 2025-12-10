@@ -34,6 +34,7 @@
     "bootstrap-icons": "^1.13.1",
     "humps": "^2.0.1",
     "monaco-editor": "^0.52.2",
+    "ng-whiteboard": "^5.1.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "vite-plugin-monaco-editor": "^1.1.0",
