@@ -568,7 +568,7 @@
         position: absolute;
         top: 0;
         left: 40%;
-        scale: 0.5;
+        scale: 0.6;
         transform: translateX(-50%);
         display: flex;
         align-items: center;
@@ -1384,7 +1384,8 @@
         position: absolute;
         bottom: 0;
         left: 38%;
-        scale: 0.5;
+        scale: 0.6;
+        height: fit-content;
         // transform: translateX(-50%);
         display: flex;
         flex-direction: row; // Row direction by default (desktop)
@@ -1415,8 +1416,9 @@
     .toolbar-bottom-right {
         position: absolute;
         bottom: 0;
-        right: -2%;
-        scale: 0.5;
+        right: -1%;
+        scale: 0.6;
+        height: 2.5rem;
         display: flex;
         align-items: center;
         gap: 4px;
@@ -1460,7 +1462,7 @@
     // ============================================================================
     .toolbar-properties {
         position: absolute;
-        scale: 0.5;
+        scale: 0.6;
         top: 40%;
         right: 0;
         transform: translateY(-50%);
@@ -2561,12 +2563,14 @@
         // Bottom toolbars - Hide left/right on mobile, only show center (tools)
         .toolbar-bottom-left,
         .toolbar-bottom-right {
-            display: none; // Hidden on mobile - controls moved to top toolbar
+            // display: none; // Hidden on mobile - controls moved to top toolbar
+            top: 2rem;
+            right: 0;
         }
 
         .toolbar-bottom-center {
-            bottom: 0;
-            left: 30%;
+            top: 2rem;
+            left: 5rem;
             // transform: translateX(-50%);
             padding: 8px 10px;
             width: calc(100% - 32px); // Fixed width instead of max-width
@@ -2713,8 +2717,7 @@
             width: fit-content;
             padding: 5px 8px;
             gap: 4px;
-            left: -10%;
-            right: auto;
+            left: -2rem;
 
             .secondary-btn {
                 width: 22px;
@@ -2744,13 +2747,15 @@
 
         .toolbar-bottom-left,
         .toolbar-bottom-right {
-            display: none;
+            // display: none;
+            right: -1rem;
         }
 
         .toolbar-bottom-center {
             width: calc(100% - 24px); // Fixed width for extra small screens
             padding: 6px;
             gap: 3px;
+            left: 3rem;
 
             .toolbar-secondary-left,
             .toolbar-secondary-right {
