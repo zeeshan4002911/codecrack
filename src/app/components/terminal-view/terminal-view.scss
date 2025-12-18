@@ -1,0 +1,31 @@
+:host {
+  #terminal-view {
+    position: absolute;
+    z-index: 10;
+    border: 2px solid #333;
+    background-color: #000;
+    color: white;
+    padding: 10px;
+    cursor: move;
+
+    .header {
+      background-color: #333;
+      padding: 10px;
+      cursor: move;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .resize-handle {
+      width: 10px;
+      height: 10px;
+      background-color: #555;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      cursor: se-resize;
+    }
+  }
+}

@@ -1,0 +1,29 @@
+<div 
+  id="terminal-view" 
+  (mousedown)="onMouseDown($event)"
+  (touchstart)="onMouseDown($event)"
+  [ngStyle]="{
+    'top': position.top + 'px', 
+    'left': position.left + 'px', 
+    'width': size.width + 'px', 
+    'height': size.height + 'px'
+  }"
+>
+
+  <!-- Header Section (optional) -->
+  <div class="header">
+    Terminal
+  </div>
+
+  <!-- Terminal Content -->
+  <div class="content">
+    <p>Terminal Content Here...</p>
+  </div>
+
+  <!-- Resizing Handle -->
+  <div 
+    class="resize-handle" 
+    (mousedown)="startResize($event)"
+    (touchstart)="startResize($event)"
+  ></div>
+</div>

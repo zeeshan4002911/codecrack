@@ -8,10 +8,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EditorView } from '../components/editor-view/editor-view';
 import { DiffCheckerView } from '../components/diff-checker-view/diff-checker-view';
 import { WhiteboardView } from '../components/whiteboard-view/whiteboard-view';
+import { TerminalView } from '@/components/terminal-view/terminal-view';
 
 @Component({
   selector: 'app-layout',
-  imports: [CommonModule, FormsModule, EditorView, DiffCheckerView, WhiteboardView],
+  imports: [CommonModule, FormsModule, EditorView, DiffCheckerView, WhiteboardView, TerminalView],
   templateUrl: './layout.html',
   styleUrl: './layout.scss'
 })
@@ -149,7 +150,9 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
       this.bToast = new Toast(toastElement);
     }
 
-    this.onResize(null);
+    setTimeout(() => {
+      this.onResize(null);
+    }, 0);
   }
 
   private checkIfMobile() {
@@ -157,6 +160,10 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public setSelectedTab(tabName: string) {
+    if (tabName == 'terminal' && 'terminal' == this.selectedTab) {
+      // Change to editor mode to give toggle effect
+      tabName = 'editor';
+    }
     this.selectedTab = tabName;
     this._appInit.setSelectedTab(tabName);
   }

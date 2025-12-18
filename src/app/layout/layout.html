@@ -37,6 +37,13 @@
             >
               Whiteboard
             </a>
+            <a 
+              class="btn-nav cursor-pointer px-2 py-1"
+              [ngClass]="{'active': selectedTab == 'terminal'}"
+              (click)="setSelectedTab('terminal')"
+            >
+              Terminal
+            </a>
           </nav>
         }
       </span>
@@ -156,16 +163,19 @@
 </section>
 
 <!-- conditions for rendering different views without routing -->
-<div [style.height]="viewContainerHeight">
+<div id="view-container" class="position-relative" [style.height]="viewContainerHeight">
   @switch (selectedTab) {
-    @case ('editor') {
-      <app-editor-view></app-editor-view>
-    }
     @case ('diff-checker') {
       <app-diff-checker-view></app-diff-checker-view>
     }
     @case ('whiteboard') {
       <app-whiteboard-view class="h-100 d-block"></app-whiteboard-view>
+    }
+    @default {
+      <app-editor-view></app-editor-view>
+      @if (selectedTab == 'terminal') {
+        <app-terminal-view></app-terminal-view>
+      }
     }
   }
 </div>
@@ -211,6 +221,14 @@
         data-bs-dismiss="offcanvas"
       >
         Whiteboard
+      </a>
+      <a 
+        class="btn-nav cursor-pointer px-2 py-1"
+        [ngClass]="{'active': selectedTab == 'terminal'}"
+        (click)="setSelectedTab('terminal')"
+        data-bs-dismiss="offcanvas"
+      >
+        Terminal
       </a>
     </nav>
   </div>
