@@ -32,7 +32,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // This method initializes the drag event when mouse is pressed
-  onMouseDown(event: MouseEvent | TouchEvent): void {
+  dragStartHandler(event: MouseEvent | TouchEvent): void {
     this.isDragging = true;
     const clientX = (event instanceof MouseEvent) ? event.clientX : event.touches[0].clientX;
     const clientY = (event instanceof MouseEvent) ? event.clientY : event.touches[0].clientY;
@@ -42,7 +42,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // This method starts the resizing event when mouse is pressed on the resize handle
-  startResize(event: MouseEvent | TouchEvent): void {
+  resizeStartHandler(event: MouseEvent | TouchEvent): void {
     event.preventDefault();
     this.isResizing = true;
   }
@@ -50,7 +50,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
   // Mouse move handler for dragging and resizing
   @HostListener('document:mousemove', ['$event'])
   @HostListener('document:touchmove', ['$event'])
-  onMouseMove(event: MouseEvent | TouchEvent): void {
+  _f1(event: MouseEvent | TouchEvent): void {
     const clientX = (event instanceof MouseEvent) ? event.clientX : event.touches[0].clientX;
     const clientY = (event instanceof MouseEvent) ? event.clientY : event.touches[0].clientY;
     if (this.isResizing) {
@@ -66,7 +66,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
   // Mouse up handler for stopping drag/resize
   @HostListener('document:mouseup')
   @HostListener('document:touchend')
-  onMouseUp(): void {
+  _f2(): void {
     this.isDragging = false;
     this.isResizing = false;
   }

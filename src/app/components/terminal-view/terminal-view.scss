@@ -19,13 +19,20 @@
     }
 
     .resize-handle {
-      width: 10px;
-      height: 10px;
-      background-color: #555;
+      width: 0.8rem;
+      height: 0.8rem;
       position: absolute;
       bottom: 0;
       right: 0;
       cursor: se-resize;
+
+      &-icon {
+        font-size: 0.8rem;
+
+        &::before {
+          vertical-align: 0.125rem;
+        }
+      }
     }
   }
 }

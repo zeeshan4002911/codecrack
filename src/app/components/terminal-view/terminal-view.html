@@ -1,7 +1,7 @@
 <div 
   id="terminal-view" 
-  (mousedown)="onMouseDown($event)"
-  (touchstart)="onMouseDown($event)"
+  (mousedown)="dragStartHandler($event)"
+  (touchstart)="dragStartHandler($event)"
   [ngStyle]="{
     'top': position.top + 'px', 
     'left': position.left + 'px', 
@@ -22,8 +22,10 @@
 
   <!-- Resizing Handle -->
   <div 
-    class="resize-handle" 
-    (mousedown)="startResize($event)"
-    (touchstart)="startResize($event)"
-  ></div>
+    class="resize-handle d-flex" 
+    (mousedown)="resizeStartHandler($event)"
+    (touchstart)="resizeStartHandler($event)"
+  >
+    <i class="bi bi-bounding-box resize-handle-icon"></i>
+  </div>
 </div>
