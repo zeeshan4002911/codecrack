@@ -19,6 +19,10 @@
         transform: rotate(180deg);
         vertical-align: 0;
       }
+
+      .layout-bottom::before {
+        transform: rotate(-90deg);
+      }
     }
 
     .content {

@@ -11,21 +11,53 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
   @Input() viewContainer!: ElementRef | undefined;
 
   position = { top: 50, left: 50 };
+  defaultSize = { width: 300, height: 200 };
   size = { width: 300, height: 200 };
   dragStart = { x: 0, y: 0 };
   isResizableEnable: boolean = true;
   isDraggableEnable: boolean = true;
   isResizing: boolean = false;
   isDragging: boolean = false;
+  selectedLayout: string = "bottom";
 
   constructor() { }
 
   ngOnInit(): void {
-
+    this.layoutChangeHandler(this.selectedLayout);
+    this.layoutChangeHandler(this.selectedLayout);
   }
 
   ngAfterViewInit(): void {
 
+  }
+
+  layoutChangeHandler(layoutName: string): void {
+    this.selectedLayout = layoutName;
+    const screenHeight = this.viewContainer?.nativeElement?.offsetHeight ?? 0;
+    const screenWidth = this.viewContainer?.nativeElement?.offsetWidth ?? 0;
+    this.isResizableEnable = false;
+    this.isDraggableEnable = false;
+    if (layoutName == "bottom") {
+      this.position.top = screenHeight - this.size.height;
+      this.position.left = 0;
+      this.size.width = screenWidth;
+      this.size.height = this.defaultSize.height;
+    } else if (layoutName == "left") {
+      this.position.top = 0;
+      this.position.left = 0;
+      this.size.height = screenHeight;
+      this.size.width = this.defaultSize.width;
+    } else if (layoutName == "right") {
+      this.position.top = 0;
+      this.position.left = screenWidth - this.size.width;
+      this.size.height = screenHeight;
+      this.size.width = this.defaultSize.width;
+    } else if (layoutName == "separate-window") {
+      this.isResizableEnable = true;
+      this.isDraggableEnable = true;
+      this.size = { ... this.defaultSize };
+      this.position = { top: 50, left: 50 };
+    }
   }
 
   // This method initializes the drag event when mouse is pressed or touch start
@@ -88,7 +120,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
 
   // Stick to the sides when dragged close
   checkStickPosition(): void {
-    const margin = 50;
+    const margin = 5;
     const screenHeight = this.viewContainer?.nativeElement?.offsetHeight ?? 0;
     const screenWidth = this.viewContainer?.nativeElement?.offsetWidth ?? 0;
 

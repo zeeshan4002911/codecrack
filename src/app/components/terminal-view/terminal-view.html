@@ -11,13 +11,25 @@
 >
 
   <!-- Header Section (optional) -->
-  <div class="header d-flex justify-content-between p-2">
+  <div class="header d-flex justify-content-between p-1">
     <div>Terminal</div>
     <div class="terminal-control d-flex">
-      <i class="bi bi-layout-sidebar"></i>
-      <i class="bi bi-layout-sidebar-reverse"></i>
-      <i class="bi bi-layout-sidebar"></i>
-      <i class="bi bi-box-arrow-down-left separate-window"></i>
+      <i 
+        (click)="layoutChangeHandler('bottom');layoutChangeHandler('bottom');" 
+        class="bi bi-layout-sidebar layout-bottom"
+      ></i>
+      <i 
+        (click)="layoutChangeHandler('left');layoutChangeHandler('left')" 
+        class="bi bi-layout-sidebar"
+      ></i>
+      <i 
+        (click)="layoutChangeHandler('right');layoutChangeHandler('right');" 
+        class="bi bi-layout-sidebar-reverse"
+      ></i>
+      <i 
+        (click)="layoutChangeHandler('separate-window')" 
+        class="bi bi-box-arrow-down-left separate-window"
+      ></i>
     </div>
   </div>
 
