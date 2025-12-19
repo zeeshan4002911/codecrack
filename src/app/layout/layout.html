@@ -163,7 +163,7 @@
 </section>
 
 <!-- conditions for rendering different views without routing -->
-<div id="view-container" class="position-relative" [style.height]="viewContainerHeight">
+<div #viewContainer id="view-container" class="position-relative" [style.height]="viewContainerHeight">
   @switch (selectedTab) {
     @case ('diff-checker') {
       <app-diff-checker-view></app-diff-checker-view>
@@ -174,7 +174,9 @@
     @default {
       <app-editor-view></app-editor-view>
       @if (selectedTab == 'terminal') {
-        <app-terminal-view></app-terminal-view>
+        <app-terminal-view
+          [viewContainer]="viewContainerRef"
+        ></app-terminal-view>
       }
     }
   }

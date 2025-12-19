@@ -5,13 +5,20 @@
     border: 2px solid #333;
     background-color: #000;
     color: white;
-    padding: 10px;
-    cursor: move;
+    // cursor: move;
 
     .header {
       background-color: #333;
-      padding: 10px;
-      cursor: move;
+      // cursor: move;
+
+      .terminal-control {
+        gap: 0.5rem;
+      }
+
+      .separate-window::before {
+        transform: rotate(180deg);
+        vertical-align: 0;
+      }
     }
 
     .content {
@@ -24,7 +31,7 @@
       position: absolute;
       bottom: 0;
       right: 0;
-      cursor: se-resize;
+      // cursor: se-resize;
 
       &-icon {
         font-size: 0.8rem;

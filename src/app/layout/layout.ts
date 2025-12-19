@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AppInit } from '../service/app-init';
 import { Popover, Modal, Toast } from 'bootstrap';
@@ -19,6 +19,8 @@ import { TerminalView } from '@/components/terminal-view/terminal-view';
 export class Layout implements OnInit, AfterViewInit, OnDestroy {
   private _destroy: Subject<boolean> = new Subject<boolean>();
   public isMobile: boolean = false;
+
+  @ViewChild('viewContainer', { static: false }) viewContainerRef!: ElementRef | undefined;
   public viewContainerHeight: string | undefined = "";
 
   public selectedTab: string | undefined = 'editor';
@@ -53,7 +55,8 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     private _appInit: AppInit,
     private _route: ActivatedRoute,
     private _router: Router,
-    private _viewContainerRef: ViewContainerRef
+    private _viewContainerRef: ViewContainerRef,
+    private _cdr: ChangeDetectorRef
   ) {
     // Subscription for theme mode (light or dark) change to trigger layout theme update
     this._appInit.themeMode$.pipe(takeUntil(this._destroy)).subscribe((val: string) => {
@@ -153,6 +156,7 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.onResize(null);
     }, 0);
+    this._cdr.detectChanges();
   }
 
   private checkIfMobile() {
