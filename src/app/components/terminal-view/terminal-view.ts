@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input
 import { CommonModule } from '@angular/common';
 import { AppInit } from '@/service/app-init';
 import { Subject, takeUntil } from 'rxjs';
+import { CodeRunnerService } from './code-runner-service';
 
 @Component({
   selector: 'app-terminal-view',
@@ -25,14 +26,47 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
   isDragging: boolean = false;
   isDarkMode: boolean = false;
 
+  output: string = "";
+  waitingForInput = false;
+  selectedLanguage: any = {};
+
   constructor(
-    private _appInit: AppInit
+    private _appInit: AppInit,
+    private _codeRunner: CodeRunnerService
   ) {
+    // Subscription for theme change
     this._appInit.themeMode$.pipe(takeUntil(this._destroy)).subscribe((themeMode) => {
       const isDarkMode = (themeMode == 'dark') ? true : false;
       this._appInit.editorOptions.theme = isDarkMode ? 'vs-dark' : 'vs';
       this.isDarkMode = isDarkMode;
     });
+
+    // Subscription for language change
+    this._appInit.selectedLanguage$.pipe(takeUntil(this._destroy)).subscribe((language: any) => {
+      this.selectedLanguage = language;
+    });
+
+    // Subscription for output and user input from worker
+    this._codeRunner.output$.pipe(takeUntil(this._destroy)).subscribe(
+      output => this.output = output
+    );
+    this._codeRunner.waitingForInput$.pipe(takeUntil(this._destroy)).subscribe(
+      waitingForInput => this.waitingForInput = waitingForInput
+    );
+  }
+
+  // On click of enter passing the user input to running worker
+  submit(event: any) {
+    this.waitingForInput = false;
+    this._codeRunner.sendInput(event.target.value);
+    event.target.value = '';
+  }
+
+  // Starting the code execution
+  runCode() {
+    const code = this._appInit.editorCode;
+    const language = this.selectedLanguage;
+    this._codeRunner.run(code, language['id']);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -181,5 +215,8 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
     this.dragStart = { x: 0, y: 0 };
     this.isResizing = false;
     this.isDragging = false;
+    this.output = "";
+    this.waitingForInput = false;
+    this.selectedLanguage = {};
   }
 }

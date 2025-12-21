@@ -2,13 +2,13 @@
   #terminal-view {
     position: absolute;
     z-index: 10;
-    
+
     .theme {
       &-dark {
         background-color: #000;
         color: #ccc;
       }
-  
+
       &-light {
         background-color: #eee;
         color: black;
@@ -45,9 +45,22 @@
       }
     }
 
-    // .content {
+    .terminal-content {
+      font-size: 0.875rem;
+      font-family: monospace;
 
-    // }
+      input {
+        outline: none;
+        border: none;
+        background-color: unset;
+      }
+
+      .auto-input {
+        display: inline-block;
+        white-space: pre;
+        outline: none;
+      }
+    }
 
     .resize-handle {
       width: 0.8rem;

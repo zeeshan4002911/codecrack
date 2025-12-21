@@ -22,7 +22,10 @@
   >
     <div>Terminal</div>
     <div class="terminal-control d-flex">
-      <i class="bi bi-play-fill cursor-pointer"></i>
+      <i 
+        (click)="runCode()"
+        class="bi bi-play-fill cursor-pointer"
+      ></i>
       <i 
         (click)="layoutChangeHandler('bottom');layoutChangeHandler('bottom');" 
         class="bi bi-layout-sidebar layout-bottom cursor-pointer"
@@ -48,13 +51,21 @@
 
   <!-- Terminal Content -->
   <div 
-    class="content py-1 px-2 flex-grow-1"
+    class="terminal-content py-1 px-2 flex-grow-1"
     [ngClass]="{
       'theme-dark': isDarkMode,
       'theme-light': !isDarkMode
     }"
   >
-    Terminal Content Here...
+    <pre class="terminal-output d-block m-0">{{ output }}</pre>
+    @if (waitingForInput) {
+      <input
+        class="px-1 auto-input w-100"
+        [style.minWidth]="'fit-content'"
+        (keydown.enter)="submit($event)"
+        autofocus
+      />
+    }
   </div>
 
   <!-- Resizing Handle -->
