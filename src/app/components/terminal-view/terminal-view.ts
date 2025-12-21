@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AppInit } from '@/service/app-init';
 import { Subject, takeUntil } from 'rxjs';
@@ -9,9 +9,11 @@ import { Subject, takeUntil } from 'rxjs';
   templateUrl: './terminal-view.html',
   styleUrl: './terminal-view.scss',
 })
-export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
+export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges {
   private _destroy: Subject<boolean> = new Subject<boolean>();
   @Input() viewContainer!: ElementRef | undefined;
+  @Input() selectedLayout: string = "";
+  @Output() sizeEmitter = new EventEmitter<{ width: number, height: number, layout: string }>();
 
   position = { top: 50, left: 50 };
   defaultSize = { width: 300, height: 200 };
@@ -21,7 +23,6 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
   isDraggableEnable: boolean = true;
   isResizing: boolean = false;
   isDragging: boolean = false;
-  selectedLayout: string = "bottom";
   isDarkMode: boolean = false;
 
   constructor(
@@ -34,14 +35,28 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
-    setTimeout(() => {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['viewContainer'] && !changes['viewContainer'].isFirstChange()) {
+      const screenHeight = this.viewContainer?.nativeElement?.offsetHeight ?? 0;
+      this.position.top = screenHeight - this.size.height;
+      this.position.left = 0;
+    }
+    if (changes['selectedLayout']) {
       this.layoutChangeHandler(this.selectedLayout);
-    }, 100);
+    }
+  }
+
+  ngOnInit(): void {
+
   }
 
   ngAfterViewInit(): void {
 
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event | null): void {
+    this.layoutChangeHandler(this.selectedLayout);
   }
 
   layoutChangeHandler(layoutName: string): void {
@@ -55,21 +70,25 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
       this.position.left = 0;
       this.size.width = screenWidth;
       this.size.height = this.defaultSize.height;
+      this.sizeEmitter.emit({ ...this.size, layout: layoutName });
     } else if (layoutName == "left") {
       this.position.top = 0;
       this.position.left = 0;
       this.size.height = screenHeight;
       this.size.width = this.defaultSize.width;
+      this.sizeEmitter.emit({ ...this.size, layout: layoutName });
     } else if (layoutName == "right") {
       this.position.top = 0;
       this.position.left = screenWidth - this.size.width;
       this.size.height = screenHeight;
       this.size.width = this.defaultSize.width;
+      this.sizeEmitter.emit({ ...this.size, layout: layoutName });
     } else if (layoutName == "separate-window") {
       this.isResizableEnable = true;
       this.isDraggableEnable = true;
       this.size = { ... this.defaultSize };
       this.position = { top: 50, left: 50 };
+      this.sizeEmitter.emit({ width: 0, height: 0, layout: layoutName });
     }
   }
 

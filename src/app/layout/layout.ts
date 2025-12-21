@@ -22,6 +22,7 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('viewContainer', { static: false }) viewContainerRef!: ElementRef | undefined;
   public viewContainerHeight: string | undefined = "";
+  public editorSize: { width: number, height: number } = { width: 0, height: 0 };
 
   public selectedTab: string | undefined = 'editor';
   public themeMode: string | undefined = 'light';
@@ -50,6 +51,8 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     type: "",
     message: "This is a sample toast",
   }
+
+  terminalLayout: string = "";
 
   constructor(
     private _appInit: AppInit,
@@ -170,6 +173,9 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     }
     this.selectedTab = tabName;
     this._appInit.setSelectedTab(tabName);
+
+    // Resizing the screen if terminal is not in view
+    if (tabName != 'terminal') this.onResize(null);
   }
 
   public toggleTheme() {
@@ -248,6 +254,25 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
 
     const appHeader = document.getElementById('app-header')?.offsetHeight ?? 0;
     this.viewContainerHeight = `calc(100vh - ${appHeader}px)`;
+
+    setTimeout(() => {
+      const screenHeight = this.viewContainerRef?.nativeElement?.offsetHeight ?? 0;
+      const screenWidth = this.viewContainerRef?.nativeElement?.offsetWidth ?? 0;
+      this.editorSize = { width: screenWidth, height: screenHeight };
+      this.terminalLayout = this.terminalLayout || "bottom";
+      this._cdr.detectChanges();
+    }, 0);
+  }
+
+  onTerminalResize(size: { width: number, height: number, layout: string }) {
+    const screenHeight = this.viewContainerRef?.nativeElement?.offsetHeight ?? 0;
+    const screenWidth = this.viewContainerRef?.nativeElement?.offsetWidth ?? 0;
+
+    const width = screenWidth - size.width > 0 ? screenWidth - size.width : screenWidth;
+    const height = screenHeight - size.height > 0 ? screenHeight - size.height : screenHeight;
+    this.editorSize = { width: width, height: height };
+    this.terminalLayout = size.layout;
+    this._cdr.detectChanges();
   }
 
   bModalPrimaryBtnClickHandler() {
@@ -384,5 +409,6 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     this.searchLanguage = "";
     this.languages = undefined;
     this.codeShareURL = "";
+    this.editorSize = { width: 0, height: 0 };
   }
 }

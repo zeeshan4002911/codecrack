@@ -172,10 +172,15 @@
       <app-whiteboard-view></app-whiteboard-view>
     }
     @default {
-      <app-editor-view></app-editor-view>
+      <app-editor-view
+        [style]="{'float': (terminalLayout == 'left') ? 'right': null}"
+        [size]="editorSize"
+      ></app-editor-view>
       @if (selectedTab == 'terminal') {
         <app-terminal-view
           [viewContainer]="viewContainerRef"
+          [selectedLayout]="terminalLayout"
+          (sizeEmitter)="onTerminalResize($event)"
         ></app-terminal-view>
       }
     }

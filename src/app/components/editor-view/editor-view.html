@@ -1,1 +1,4 @@
- <div id="monaco-container" class="h-100 w-100"></div>
+<div id="monaco-container" class="h-100 w-100" [style]="{
+  'width': (size.width ? size.width + 'px !important': null),
+  'height': (size.height ? size.height + 'px !important': null)
+}"></div>

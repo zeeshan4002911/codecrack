@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, HostListener, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, HostListener, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import * as monaco from 'monaco-editor';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
@@ -11,9 +11,10 @@ import { AppInit } from '@/service/app-init';
   styleUrl: './editor-view.scss',
   standalone: true
 })
-export class EditorView implements AfterViewInit, OnDestroy {
+export class EditorView implements AfterViewInit, OnDestroy, OnChanges {
   private _destroy: Subject<boolean> = new Subject<boolean>();
   private editorInstance: monaco.editor.IStandaloneCodeEditor | null = null;
+  @Input() size = { width: 0, height: 0 };
 
   constructor(
     private _appInit: AppInit
@@ -113,6 +114,14 @@ export class EditorView implements AfterViewInit, OnDestroy {
         this.editorInstance.setValue(this._appInit.editorCode);
       }
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['size'] && !changes['size'].isFirstChange()) {
+      if (this.editorInstance) {
+        this.editorInstance.layout();
+      }
+    }
   }
 
   ngAfterViewInit(): void {
