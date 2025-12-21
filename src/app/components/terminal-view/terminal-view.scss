@@ -2,17 +2,37 @@
   #terminal-view {
     position: absolute;
     z-index: 10;
-    border: 2px solid #333;
-    background-color: #000;
-    color: white;
-    // cursor: move;
+    
+    .theme {
+      &-dark {
+        background-color: #000;
+        color: #ccc;
+      }
+  
+      &-light {
+        background-color: #eee;
+        color: black;
+      }
+    }
 
     .header {
-      background-color: #333;
-      // cursor: move;
+
+      &-dark {
+        background-color: #333;
+        color: white;
+      }
+
+      &-light {
+        background-color: #aaa;
+        color: black;
+      }
 
       .terminal-control {
         gap: 0.5rem;
+      }
+
+      .active-border {
+        border-bottom: 1px solid white;
       }
 
       .separate-window::before {
@@ -25,9 +45,9 @@
       }
     }
 
-    .content {
-      padding: 20px;
-    }
+    // .content {
+
+    // }
 
     .resize-handle {
       width: 0.8rem;
@@ -35,7 +55,7 @@
       position: absolute;
       bottom: 0;
       right: 0;
-      // cursor: se-resize;
+      cursor: se-resize;
 
       &-icon {
         font-size: 0.8rem;

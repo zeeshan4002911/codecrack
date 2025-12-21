@@ -1,5 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AppInit } from '@/service/app-init';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-terminal-view',
@@ -8,6 +10,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './terminal-view.scss',
 })
 export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
+  private _destroy: Subject<boolean> = new Subject<boolean>();
   @Input() viewContainer!: ElementRef | undefined;
 
   position = { top: 50, left: 50 };
@@ -19,12 +22,22 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
   isResizing: boolean = false;
   isDragging: boolean = false;
   selectedLayout: string = "bottom";
+  isDarkMode: boolean = false;
 
-  constructor() { }
+  constructor(
+    private _appInit: AppInit
+  ) {
+    this._appInit.themeMode$.pipe(takeUntil(this._destroy)).subscribe((themeMode) => {
+      const isDarkMode = (themeMode == 'dark') ? true : false;
+      this._appInit.editorOptions.theme = isDarkMode ? 'vs-dark' : 'vs';
+      this.isDarkMode = isDarkMode;
+    });
+  }
 
   ngOnInit(): void {
-    this.layoutChangeHandler(this.selectedLayout);
-    this.layoutChangeHandler(this.selectedLayout);
+    setTimeout(() => {
+      this.layoutChangeHandler(this.selectedLayout);
+    }, 100);
   }
 
   ngAfterViewInit(): void {
@@ -142,6 +155,8 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this._destroy.next(false);
+    this._destroy.complete();
     this.position = { top: 0, left: 0 };
     this.size = { width: 0, height: 0 };
     this.dragStart = { x: 0, y: 0 };

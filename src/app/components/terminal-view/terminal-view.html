@@ -1,49 +1,70 @@
 <div 
   id="terminal-view" 
+  class="d-flex flex-column"
   (mousedown)="dragStartHandler($event)"
   (touchstart)="dragStartHandler($event)"
   [ngStyle]="{
     'top': position.top + 'px', 
     'left': position.left + 'px', 
     'width': size.width + 'px', 
-    'height': size.height + 'px'
+    'height': size.height + 'px',
+    'cursor': selectedLayout === 'separate-window' ? 'move': ''
   }"
 >
 
-  <!-- Header Section (optional) -->
-  <div class="header d-flex justify-content-between p-1">
+  <!-- Header Section -->
+  <div 
+    class="header d-flex justify-content-between py-1 px-2"
+    [ngClass]="{
+      'header-dark': isDarkMode,
+      'header-light': !isDarkMode
+    }"
+  >
     <div>Terminal</div>
     <div class="terminal-control d-flex">
+      <i class="bi bi-play-fill cursor-pointer"></i>
       <i 
         (click)="layoutChangeHandler('bottom');layoutChangeHandler('bottom');" 
-        class="bi bi-layout-sidebar layout-bottom"
+        class="bi bi-layout-sidebar layout-bottom cursor-pointer"
+        [ngClass]="{'active-border': selectedLayout === 'bottom'}"
       ></i>
       <i 
         (click)="layoutChangeHandler('left');layoutChangeHandler('left')" 
-        class="bi bi-layout-sidebar"
+        class="bi bi-layout-sidebar cursor-pointer"
+        [ngClass]="{'active-border': selectedLayout === 'left'}"
       ></i>
       <i 
         (click)="layoutChangeHandler('right');layoutChangeHandler('right');" 
-        class="bi bi-layout-sidebar-reverse"
+        class="bi bi-layout-sidebar-reverse cursor-pointer"
+        [ngClass]="{'active-border': selectedLayout === 'right'}"
       ></i>
       <i 
         (click)="layoutChangeHandler('separate-window')" 
-        class="bi bi-box-arrow-down-left separate-window"
+        class="bi bi-box-arrow-down-left separate-window cursor-pointer"
+        [ngClass]="{'active-border': selectedLayout === 'separate-window'}"
       ></i>
     </div>
   </div>
 
   <!-- Terminal Content -->
-  <div class="content">
-    <p>Terminal Content Here...</p>
+  <div 
+    class="content py-1 px-2 flex-grow-1"
+    [ngClass]="{
+      'theme-dark': isDarkMode,
+      'theme-light': !isDarkMode
+    }"
+  >
+    Terminal Content Here...
   </div>
 
   <!-- Resizing Handle -->
-  <div 
-    class="resize-handle d-flex" 
-    (mousedown)="resizeStartHandler($event)"
-    (touchstart)="resizeStartHandler($event)"
-  >
-    <i class="bi bi-bounding-box resize-handle-icon"></i>
-  </div>
+  @if (selectedLayout === 'separate-window') {
+    <div
+      class="resize-handle d-flex" 
+      (mousedown)="resizeStartHandler($event)"
+      (touchstart)="resizeStartHandler($event)"
+    >
+      <i class="bi bi-bounding-box resize-handle-icon"></i>
+    </div>
+  }
 </div>
