@@ -62,13 +62,40 @@
       }
     }
 
-    .resize-handle {
-      width: 0.8rem;
-      height: 0.8rem;
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      cursor: se-resize;
+    .resize-handler {
+      opacity: 0;
+
+      &:hover {
+        background-color: #13A10E;
+        opacity: 1;
+      }
+
+      &-bottom {
+        height: 3px;
+        top: 0;
+        cursor: n-resize;
+      }
+
+      &-left {
+        width: 3px;
+        right: 0;
+        cursor: e-resize;
+      }
+
+      &-right {
+        width: 3px;
+        left: 0;
+        cursor: w-resize;
+      }
+
+      &-window {
+        width: 0.8rem;
+        height: 0.8rem;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        cursor: se-resize;
+      }
 
       &-icon {
         font-size: 0.8rem;

@@ -68,14 +68,23 @@
     }
   </div>
 
-  <!-- Resizing Handle -->
-  @if (selectedLayout === 'separate-window') {
-    <div
-      class="resize-handle d-flex" 
-      (mousedown)="resizeStartHandler($event)"
-      (touchstart)="resizeStartHandler($event)"
-    >
-      <i class="bi bi-bounding-box resize-handle-icon"></i>
+  <!-- Resizing Handlers -->
+  @if(selectedLayout === 'bottom') {
+    <div class="resize-handler resize-handler-bottom w-100 position-absolute" (mousedown)="resizeStartHandler($event)"
+      (touchstart)="resizeStartHandler($event)"></div>
+  }
+  @else if(selectedLayout === 'right') {
+    <div class="resize-handler resize-handler-right h-100 position-absolute" (mousedown)="resizeStartHandler($event)"
+      (touchstart)="resizeStartHandler($event)"></div>
+  }
+  @else if(selectedLayout === 'left') {
+    <div class="resize-handler resize-handler-left h-100 position-absolute" (mousedown)="resizeStartHandler($event)"
+      (touchstart)="resizeStartHandler($event)"></div>
+  }
+  @else if (selectedLayout === 'separate-window') {
+    <div class="resize-handler-window d-flex" (mousedown)="resizeStartHandler($event)" 
+      (touchstart)="resizeStartHandler($event)">
+      <i class="bi bi-bounding-box resize-handler-icon"></i>
     </div>
   }
 </div>
