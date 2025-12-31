@@ -44,7 +44,7 @@ export class CodeRunnerService {
                     this.output$.next(this.output$.value + data.value);
                     break;
                 case 'ready':
-                    this.output$.next(`${this.selectedLanguage['name']} Worker is loaded and ready to use 🎉`);
+                    this.output$.next(`${this.selectedLanguage['name']} Worker is loaded and ready to use 🎉\n`);
                     console.info(`${this.selectedLanguage['name']} Worker is loaded and ready to use`);
                     this.workerStatus$.next(true);
                     break;
@@ -57,7 +57,7 @@ export class CodeRunnerService {
             this.config(this.selectedLanguage);
         }
 
-        this.output$.next('Executing the code....\n');
+        this.output$.next('');
         if (this.worker) 
             this.worker.postMessage({ type: 'run', code });
     }
