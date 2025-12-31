@@ -30,6 +30,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
   waitingForInput: boolean = false;
   workerStatus: boolean = false;
   selectedLanguage: any = {};
+  terminalFontSize: number | undefined = 16;
 
   constructor(
     private _appInit: AppInit,
@@ -40,6 +41,11 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
       const isDarkMode = (themeMode == 'dark') ? true : false;
       this._appInit.editorOptions.theme = isDarkMode ? 'vs-dark' : 'vs';
       this.isDarkMode = isDarkMode;
+    });
+
+    // Subscribe for update of editor options and code
+    this._appInit.editorUpdate$.pipe(takeUntil(this._destroy)).subscribe(() => {
+      this.terminalFontSize = this._appInit.editorOptions.fontSize;
     });
 
     // Subscription for language change
@@ -226,5 +232,6 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
     this.waitingForInput = false;
     this.workerStatus = false;
     this.selectedLanguage = {};
+    this.terminalFontSize = undefined;
   }
 }

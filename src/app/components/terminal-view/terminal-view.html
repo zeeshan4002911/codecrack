@@ -1,8 +1,7 @@
 <div 
   id="terminal-view" 
   class="d-flex flex-column"
-  (mousedown)="dragStartHandler($event)"
-  (touchstart)="dragStartHandler($event)"
+  
   [ngStyle]="{
     'top': position.top + 'px', 
     'left': position.left + 'px', 
@@ -19,31 +18,38 @@
       'header-dark': isDarkMode,
       'header-light': !isDarkMode
     }"
+    (mousedown)="dragStartHandler($event)"
+    (touchstart)="dragStartHandler($event)"
   >
     <div>Terminal</div>
     <div class="terminal-control d-flex">
       <i 
         (click)="runCode()"
+        (touchstart)="runCode()"
         class="bi bi-play-fill cursor-pointer"
         [ngClass]="{'run-disable': !workerStatus}"
       ></i>
       <i 
         (click)="layoutChangeHandler('bottom');layoutChangeHandler('bottom');" 
+        (touchstart)="layoutChangeHandler('bottom');layoutChangeHandler('bottom');" 
         class="bi bi-layout-sidebar layout-bottom cursor-pointer"
         [ngClass]="{'active-border': selectedLayout === 'bottom'}"
       ></i>
       <i 
         (click)="layoutChangeHandler('left');layoutChangeHandler('left')" 
+        (touchstart)="layoutChangeHandler('left');layoutChangeHandler('left')" 
         class="bi bi-layout-sidebar cursor-pointer"
         [ngClass]="{'active-border': selectedLayout === 'left'}"
       ></i>
       <i 
         (click)="layoutChangeHandler('right');layoutChangeHandler('right');" 
+        (touchstart)="layoutChangeHandler('right');layoutChangeHandler('right');" 
         class="bi bi-layout-sidebar-reverse cursor-pointer"
         [ngClass]="{'active-border': selectedLayout === 'right'}"
       ></i>
       <i 
         (click)="layoutChangeHandler('separate-window')" 
+        (touchstart)="layoutChangeHandler('separate-window')" 
         class="bi bi-box-arrow-down-left separate-window cursor-pointer"
         [ngClass]="{'active-border': selectedLayout === 'separate-window'}"
       ></i>
@@ -57,6 +63,7 @@
       'theme-dark': isDarkMode,
       'theme-light': !isDarkMode
     }"
+    [style.fontSize]="terminalFontSize + 'px'"
   >
     <pre class="terminal-output d-block m-0">{{ output }}</pre>
     @if (waitingForInput) {

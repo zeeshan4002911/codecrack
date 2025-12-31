@@ -21,7 +21,7 @@ export class AppInit {
       automaticLayout: true,
       scrollBeyondLastLine: true,
       wordWrap: true, // For toggling the word wrap 'on' & 'off'
-      fontSize: 14
+      fontSize: 16
     },
     selectedTab: "editor",
     themeMode: (this.prefersDarkMode) ? "dark" : "light",
@@ -155,8 +155,10 @@ export class AppInit {
         editorOptionUpdate = false;
     }
     this.appActionSubject.next({ action, payload });
-    if (editorOptionUpdate)
+    if (editorOptionUpdate) {
       this._localStorageService.set('editorOptions', this.editorOptions);
+      this.editorUpdateSubject.next(this.editorOptions);
+    }
   }
 
   /* Persistency of selected Tab, default to editor view */
@@ -168,7 +170,7 @@ export class AppInit {
 
   /* Default editor Option, gets overwritten on run time */
   editorOptions = this.defaultData['editorOptions'];
-  private editorUpdateSubject = new BehaviorSubject(null);
+  private editorUpdateSubject = new BehaviorSubject(this.editorOptions);
   // private editorUpdateSubject = new BehaviorSubject<{}>({});
   editorUpdate$ = this.editorUpdateSubject.asObservable();
 
@@ -294,7 +296,7 @@ export class AppInit {
     this.editorCode = appData['editorCode'];
     this.originalCode = appData['originalCode'];
     this.modifiedCode = appData['modifiedCode'];
-    this.editorUpdateSubject.next(null);
+    this.editorUpdateSubject.next(this.editorOptions);
 
     // Updating in local storage for cache
     this._localStorageService.setAll(appData);
