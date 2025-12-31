@@ -9,7 +9,12 @@ function send(type: string, value?: string) {
 }
 
 const fakeConsole = {
-    log: (...args: any[]) => send('output', args.join(' ')),
+    log: (...args: any[]) => {
+        if (args.some(arg => arg instanceof Promise)) {
+            args.push('\nhint: Add await before the readLine()');
+        }
+        return send('output', args.join(' '));
+    },
     error: (...args: any[]) => send('output', '[error] ' + args.join(' '))
 };
 
