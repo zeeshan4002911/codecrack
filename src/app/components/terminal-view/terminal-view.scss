@@ -62,6 +62,10 @@
       }
     }
 
+    .terminal-output {
+      white-space: pre-wrap;
+    }
+
     .resize-handler {
       opacity: 0;
 

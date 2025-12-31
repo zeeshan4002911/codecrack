@@ -9,6 +9,10 @@ function send(type, value) {
 // Redirect Python's print() to our fakeConsole
 const pyConsole = {
     write: (text) => {
+        text = String(text) 
+        if (text.includes("PyodideFuture")) {
+            text += '\nhint: Add await before the input()';
+        }
         send('output', text);
     }
 };
@@ -64,7 +68,11 @@ self.onmessage = async (e) => {
             const endTime = performance.now();
             send('done', (endTime - startTime).toFixed(2));
         } catch (err) {
-            send('error', err.toString());
+            let errMsg = err.toString();
+            if (errMsg.includes("PyodideFuture")) {
+                errMsg += '\nhint: Add await before the input()';
+            }
+            send('error', errMsg);
         }
     }
 };

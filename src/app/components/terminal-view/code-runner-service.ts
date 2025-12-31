@@ -4,7 +4,7 @@ import { BehaviorSubject } from "rxjs";
 @Injectable({ providedIn: 'root' })
 export class CodeRunnerService {
     private worker?: Worker;
-    private autoTerminateTimeMS = 10000;
+    private autoTerminateTimeMS = 60000;
     output$ = new BehaviorSubject<string>('Click Run button to execute code');
     waitingForInput$ = new BehaviorSubject<boolean>(false);
 
@@ -13,15 +13,18 @@ export class CodeRunnerService {
 
         // Worker creation based on monaco language id
         if (language == 'javascript') {
+            this.output$.next('Loading the Javascript worker for environment....\n');
             this.worker = new Worker(new URL('./workers/js.worker.js', import.meta.url));
         } else if (language == 'typescript') {
+            this.output$.next('Loading the Typescript worker for environment....\n');
             this.worker = new Worker(new URL('./workers/ts.worker.ts', import.meta.url), { type: 'module' })
         } else if (language === 'python') {
+            this.output$.next('Loading the Python worker for environment....\n');
             this.worker = new Worker(new URL('./workers/python.worker.js', import.meta.url), { type: 'module' });
         }
 
         if (!this.worker) {
-            console.info(`No worker present for ${language}`);
+            this.output$.next(`No worker present for ${language}`);
             return;
         }
         this.worker.onmessage = ({ data }) => {
@@ -36,17 +39,18 @@ export class CodeRunnerService {
                     this.output$.next(this.output$.value + `[Finished in ${data.value} ms]\n`);
                     break;
                 case 'error':
+                    this.cleanup();
                     this.output$.next(this.output$.value + data.value);
                     break;
                 case 'ready':
                     this.output$.next('Executing the code....\n');
                     if (this.worker) this.worker.postMessage({ type: 'run', code });
+                    setTimeout(() => {
+                        this.cleanup();
+                        this.output$.next(this.output$.value + `[Terminated in ${this.autoTerminateTimeMS} ms]\n`);
+                    }, this.autoTerminateTimeMS);
             }
         };
-
-        this.output$.next('Loading the environment....\n');
-        // this.worker.postMessage({ type: 'run', code });
-        setTimeout(() => this.worker?.terminate(), this.autoTerminateTimeMS);
     }
 
     sendInput(value: string) {
@@ -57,5 +61,6 @@ export class CodeRunnerService {
     cleanup() {
         this.worker?.terminate();
         this.worker = undefined;
+        this.waitingForInput$.next(false);
     }
 }
