@@ -8,7 +8,7 @@ import monacoEditorPlugin from 'vite-plugin-monaco-editor';
 export default defineConfig({
     root: path.resolve(__dirname, './src'),
     build: {
-    //     outDir: path.resolve(__dirname, './dist'),
+        // outDir: path.resolve(__dirname, './dist'),
         rollupOptions: {
             output: {
                 manualChunks(id) {
@@ -29,6 +29,9 @@ export default defineConfig({
     ],
     optimizeDeps: {
         exclude: ['pyodide']
+    },
+    worker: {
+        format: "es"
     },
     server: {
         port: 4200,
