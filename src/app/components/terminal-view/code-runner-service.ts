@@ -4,29 +4,31 @@ import { BehaviorSubject } from "rxjs";
 @Injectable({ providedIn: 'root' })
 export class CodeRunnerService {
     private worker?: Worker;
-    private autoTerminateTimeMS = 60000;
+    workerStatus$ = new BehaviorSubject<boolean>(false);
     output$ = new BehaviorSubject<string>('Click Run button to execute code');
     waitingForInput$ = new BehaviorSubject<boolean>(false);
+    selectedLanguage = { id: "", name: "" };
 
-    run(code: string, language: string) {
-        this.cleanup();
-
+    config(selectedLanguage: { id: string, name: string }) {
+        this.terminate();
+        this.selectedLanguage = selectedLanguage;
+        this.output$.next(`Loading the ${this.selectedLanguage['name']} worker for environment....⏳\n`);
+        console.info(`Loading started for ${this.selectedLanguage['name']} worker`);
+        
         // Worker creation based on monaco language id
-        if (language == 'javascript') {
-            this.output$.next('Loading the Javascript worker for environment....\n');
-            this.worker = new Worker(new URL('./workers/js.worker.js', import.meta.url));
-        } else if (language == 'typescript') {
-            this.output$.next('Loading the Typescript worker for environment....\n');
+        if (selectedLanguage['id'] == 'javascript') {
+            this.worker = new Worker(new URL('./workers/js.worker.js', import.meta.url), { type: 'module' });
+        } else if (selectedLanguage['id'] == 'typescript') {
             this.worker = new Worker(new URL('./workers/ts.worker.ts', import.meta.url), { type: 'module' })
-        } else if (language === 'python') {
-            this.output$.next('Loading the Python worker for environment....\n');
+        } else if (selectedLanguage['id'] === 'python') {
             this.worker = new Worker(new URL('./workers/python.worker.js', import.meta.url), { type: 'module' });
         }
 
         if (!this.worker) {
-            this.output$.next(`No worker present for ${language}`);
+            this.output$.next(`No worker present for ${this.selectedLanguage['name']}`);
             return;
         }
+
         this.worker.onmessage = ({ data }) => {
             switch (data.type) {
                 case 'output':
@@ -39,18 +41,25 @@ export class CodeRunnerService {
                     this.output$.next(this.output$.value + `[Finished in ${data.value} ms]\n`);
                     break;
                 case 'error':
-                    this.cleanup();
                     this.output$.next(this.output$.value + data.value);
                     break;
                 case 'ready':
-                    this.output$.next('Executing the code....\n');
-                    if (this.worker) this.worker.postMessage({ type: 'run', code });
-                    setTimeout(() => {
-                        this.cleanup();
-                        this.output$.next(this.output$.value + `[Terminated in ${this.autoTerminateTimeMS} ms]\n`);
-                    }, this.autoTerminateTimeMS);
+                    this.output$.next(`${this.selectedLanguage['name']} Worker is loaded and ready to use 🎉`);
+                    console.info(`${this.selectedLanguage['name']} Worker is loaded and ready to use`);
+                    this.workerStatus$.next(true);
+                    break;
             }
         };
+    }
+
+    run(code: string) {
+        if (!this.worker) {
+            this.config(this.selectedLanguage);
+        }
+
+        this.output$.next('Executing the code....\n');
+        if (this.worker) 
+            this.worker.postMessage({ type: 'run', code });
     }
 
     sendInput(value: string) {
@@ -58,9 +67,10 @@ export class CodeRunnerService {
         this.worker?.postMessage({ type: 'input', value });
     }
 
-    cleanup() {
+    terminate() {
         this.worker?.terminate();
         this.worker = undefined;
+        this.workerStatus$.next(false);
         this.waitingForInput$.next(false);
     }
 }

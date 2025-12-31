@@ -9,6 +9,7 @@ import { EditorView } from '../components/editor-view/editor-view';
 import { DiffCheckerView } from '../components/diff-checker-view/diff-checker-view';
 import { WhiteboardView } from '../components/whiteboard-view/whiteboard-view';
 import { TerminalView } from '@/components/terminal-view/terminal-view';
+import { CodeRunnerService } from '@/components/terminal-view/code-runner-service';
 
 @Component({
   selector: 'app-layout',
@@ -59,7 +60,8 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     private _route: ActivatedRoute,
     private _router: Router,
     private _viewContainerRef: ViewContainerRef,
-    private _cdr: ChangeDetectorRef
+    private _cdr: ChangeDetectorRef,
+    private _codeRunner: CodeRunnerService
   ) {
     // Subscription for theme mode (light or dark) change to trigger layout theme update
     this._appInit.themeMode$.pipe(takeUntil(this._destroy)).subscribe((val: string) => {
@@ -70,6 +72,12 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
     // Subscription for language change to reflect in layout
     this._appInit.selectedLanguage$.pipe(takeUntil(this._destroy)).subscribe((language: any) => {
       this.selectedLanguage = language;
+
+      // Loading the language worker in worker thread if present
+      const languageId = this.selectedLanguage['id'];
+      const languageName = this.selectedLanguage?.['aliases']?.[0] || this.selectedLanguage['id'];
+      const selectedLanguage = { id: languageId, name: languageName };
+      this._codeRunner.config(selectedLanguage);
     });
 
 
@@ -400,6 +408,7 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this._destroy.next(false);
     this._destroy.complete();
+    this._codeRunner.terminate();
     this.viewContainerHeight = undefined;
     this.themeMode = undefined;
     this.moreOptionsPopoverInstance = undefined;

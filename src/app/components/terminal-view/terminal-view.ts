@@ -27,7 +27,8 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
   isDarkMode: boolean = false;
 
   output: string = "";
-  waitingForInput = false;
+  waitingForInput: boolean = false;
+  workerStatus: boolean = false;
   selectedLanguage: any = {};
 
   constructor(
@@ -53,6 +54,9 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
     this._codeRunner.waitingForInput$.pipe(takeUntil(this._destroy)).subscribe(
       waitingForInput => this.waitingForInput = waitingForInput
     );
+    this._codeRunner.workerStatus$.pipe(takeUntil(this._destroy)).subscribe(
+      status => this.workerStatus = status
+    )
   }
 
   // On click of enter passing the user input to running worker
@@ -64,9 +68,12 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
 
   // Starting the code execution
   runCode() {
+    if (!this.workerStatus) {
+      console.warn("Worker is not ready to use.")
+      return;
+    }
     const code = this._appInit.editorCode;
-    const language = this.selectedLanguage;
-    this._codeRunner.run(code, language['id']);
+    this._codeRunner.run(code);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -217,6 +224,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
     this.isDragging = false;
     this.output = "";
     this.waitingForInput = false;
+    this.workerStatus = false;
     this.selectedLanguage = {};
   }
 }

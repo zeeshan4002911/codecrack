@@ -25,6 +25,7 @@
       <i 
         (click)="runCode()"
         class="bi bi-play-fill cursor-pointer"
+        [ngClass]="{'run-disable': !workerStatus}"
       ></i>
       <i 
         (click)="layoutChangeHandler('bottom');layoutChangeHandler('bottom');" 

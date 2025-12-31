@@ -35,6 +35,12 @@
         border-bottom: 1px solid white;
       }
 
+      .run-disable {
+        cursor: not-allowed;
+        pointer-events: none;
+        opacity: 0.5;
+      }
+
       .separate-window::before {
         transform: rotate(180deg);
         vertical-align: 0;
