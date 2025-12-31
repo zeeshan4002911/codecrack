@@ -8,7 +8,7 @@ function send(type, value) {
 
 // Redirect Python's print() to mask write
 function pyOutput(text) {
-    text = String(text) 
+    text = String(text)
     if (text.includes("PyodideFuture")) {
         text += '\nhint: Add await before the input()';
     }

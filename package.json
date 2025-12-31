@@ -38,6 +38,7 @@
     "ng-whiteboard": "^5.1.1",
     "pyodide": "^0.29.0",
     "rxjs": "~7.8.0",
+    "sql-formatter": "^15.6.12",
     "tslib": "^2.3.0",
     "vite-plugin-monaco-editor": "^1.1.0",
     "zone.js": "^0.15.1"
@@ -58,6 +59,7 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.9.2",
     "vite": "^7.2.2",
+    "vite-plugin-static-copy": "^3.1.4",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }

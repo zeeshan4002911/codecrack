@@ -3,6 +3,7 @@ import path from 'path';
 import viteTsConfigPaths from 'vite-tsconfig-paths';
 import angular from '@analogjs/vite-plugin-angular';
 import monacoEditorPlugin from 'vite-plugin-monaco-editor';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 
 export default defineConfig({
@@ -26,6 +27,14 @@ export default defineConfig({
         }),
         viteTsConfigPaths(),
         monacoEditorPlugin({}),
+        viteStaticCopy({
+            targets: [
+                {
+                    src: "assets/pyodide/*",
+                    dest: "assets"
+                }
+            ]
+        })
     ],
     optimizeDeps: {
         exclude: ['pyodide']
