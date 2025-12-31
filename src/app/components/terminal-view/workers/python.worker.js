@@ -6,19 +6,18 @@ function send(type, value) {
     postMessage({ type, value });
 }
 
-// Redirect Python's print() to our fakeConsole
-const pyConsole = {
-    write: (text) => {
-        text = String(text) 
-        if (text.includes("PyodideFuture")) {
-            text += '\nhint: Add await before the input()';
-        }
-        send('output', text);
+// Redirect Python's print() to mask write
+function pyOutput(text) {
+    text = String(text) 
+    if (text.includes("PyodideFuture")) {
+        text += '\nhint: Add await before the input()';
     }
-};
+    send('output', text);
+}
 
-// Mask input() function
 let inputResolver = null;
+
+// Mask input() function to wait for user input (await is required before python input())
 function pyInput(prompt) {
     send('output', prompt);
     send('input-request');
@@ -40,12 +39,11 @@ async function initializePyodide() {
 
 initializePyodide();
 
-// Worker main loop
 self.onmessage = async (e) => {
     const { type, code, value } = e.data;
 
     if (type === 'input' && inputResolver) {
-        // Resolve input from the main thread
+        // Resolve user input from the main thread
         inputResolver(value);
         inputResolver = null;
         return;
@@ -54,15 +52,14 @@ self.onmessage = async (e) => {
     if (type === 'run' && pyodide) {
         const startTime = performance.now();
         try {
-            // Expose print and input to Python
-            pyodide.globals.set('print', (msg) => pyConsole.write(msg));
+            // Updating print and input of Python to custom input and output
+            pyodide.globals.set('print', (msg) => pyOutput(msg));
             pyodide.globals.set('input', async (prompt) => {
-                // Wait for input asynchronously
                 const response = await pyInput(prompt);
                 return response;
             });
 
-            // Run the Python code
+            // Running the Python code
             await pyodide.runPythonAsync(code);
 
             const endTime = performance.now();
