@@ -17,6 +17,7 @@ export default defineConfig({
                     }
                 },
             },
+            external: ['pyodide']
         }
     },
     plugins: [
@@ -26,6 +27,9 @@ export default defineConfig({
         viteTsConfigPaths(),
         monacoEditorPlugin({}),
     ],
+    optimizeDeps: {
+        exclude: ['pyodide']
+    },
     server: {
         port: 4200,
     }

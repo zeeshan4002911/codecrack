@@ -51,3 +51,5 @@ onmessage = async (e) => {
         }
     }
 };
+
+send('ready');

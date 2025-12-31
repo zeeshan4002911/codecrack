@@ -36,6 +36,7 @@
     "material-icons": "^1.13.14",
     "monaco-editor": "^0.52.2",
     "ng-whiteboard": "^5.1.1",
+    "pyodide": "^0.29.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "vite-plugin-monaco-editor": "^1.1.0",

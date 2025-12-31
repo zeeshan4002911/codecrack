@@ -16,6 +16,8 @@ export class CodeRunnerService {
             this.worker = new Worker(new URL('./workers/js.worker.js', import.meta.url));
         } else if (language == 'typescript') {
             this.worker = new Worker(new URL('./workers/ts.worker.ts', import.meta.url), { type: 'module' })
+        } else if (language === 'python') {
+            this.worker = new Worker(new URL('./workers/python.worker.js', import.meta.url), { type: 'module' });
         }
 
         if (!this.worker) {
@@ -35,11 +37,15 @@ export class CodeRunnerService {
                     break;
                 case 'error':
                     this.output$.next(this.output$.value + data.value);
+                    break;
+                case 'ready':
+                    this.output$.next('Executing the code....\n');
+                    if (this.worker) this.worker.postMessage({ type: 'run', code });
             }
         };
 
-        this.output$.next('');
-        this.worker.postMessage({ type: 'run', code });
+        this.output$.next('Loading the environment....\n');
+        // this.worker.postMessage({ type: 'run', code });
         setTimeout(() => this.worker?.terminate(), this.autoTerminateTimeMS);
     }
 

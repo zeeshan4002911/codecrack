@@ -62,3 +62,5 @@ addEventListener('message', async ({ data }) => {
         }
     }
 });
+
+send('ready');
