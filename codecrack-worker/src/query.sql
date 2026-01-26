@@ -1,6 +1,8 @@
 /*
  For Local
  npx wrangler d1 execute codecrack --file=./src/query.sql
+ npx wrangler d1 execute codecrack --command="SELECT * FROM codecrack_code_store where codeshare_id = 'zeesh';"
+ 
  For Production
  npx wrangler d1 execute codecrack --remote --file=./src/query.sql
  */

@@ -56,7 +56,7 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   terminalLayout: string = "";
 
   constructor(
-    private _appInit: AppInit,
+    protected _appInit: AppInit,
     private _route: ActivatedRoute,
     private _router: Router,
     private _viewContainerRef: ViewContainerRef,

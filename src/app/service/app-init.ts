@@ -34,6 +34,7 @@ export class AppInit {
     editorCode: 'function x() {\n\tconsole.log("Hello world 😺!");\n}',
     originalCode: 'function x() {\n\tconsole.log("Hello world from left 😺!");\n}',
     modifiedCode: 'function x() {\n\tconsole.log("Hello world from right 😺!");\n}',
+    whiteboardData: ''
   };
 
   constructor(
@@ -83,6 +84,10 @@ export class AppInit {
     if (modifiedCode) {
       this.modifiedCode = modifiedCode;
     }
+    const whiteboardDataCache = this._localStorageService.get('whiteboardData');
+    if (whiteboardDataCache) {
+      this.whiteboardData = whiteboardDataCache;
+    }
 
     /* Listener with debounce to save code to localStorage  */
     const debounTime = 3000;
@@ -100,6 +105,11 @@ export class AppInit {
       debounceTime(debounTime)
     ).subscribe(code => {
       this._localStorageService.set('modifiedCode', code);
+    });
+    this.whiteboardDataSubject.pipe(
+      debounceTime(debounTime)
+    ).subscribe(data => {
+      this._localStorageService.set('whiteboardData', data);
     });
   }
 
@@ -178,10 +188,12 @@ export class AppInit {
   editorCode: string = this.defaultData['editorCode'];
   originalCode: string = this.defaultData['originalCode'];
   modifiedCode: string = this.defaultData['modifiedCode'];
+  whiteboardData: string = this.defaultData['whiteboardData'];
 
   private editorCodeSubject = new Subject<string>();
   private originalCodeSubject = new Subject<string>();
   private modifiedCodeSubject = new Subject<string>();
+  private whiteboardDataSubject = new Subject<string>();
 
   setEditorCode(code: string) {
     this.editorCode = code;
@@ -198,11 +210,20 @@ export class AppInit {
     this.modifiedCodeSubject.next(code);
   }
 
+  setWhiteboardData(data: string) {
+    this.whiteboardData = data;
+    this.whiteboardDataSubject.next(data);
+  }
+
   resetApp() {
     this._localStorageService.clear();
     // location.reload();
     this.setAppParameters({});
   }
+
+  // Subject and observable to signal the update of whiteboard data post code pull
+  private whiteboardDataUpdateSubject = new Subject<string>();
+  whiteboardDataUpdate$ = this.whiteboardDataUpdateSubject.asObservable();
 
   getCloudData() {
     this._cloudStorageService.pullCodeHandler(this.codeShareId).subscribe({
@@ -296,6 +317,8 @@ export class AppInit {
     this.editorCode = appData['editorCode'];
     this.originalCode = appData['originalCode'];
     this.modifiedCode = appData['modifiedCode'];
+    this.whiteboardData = appData['whiteboardData'];
+    this.whiteboardDataUpdateSubject.next(this.whiteboardData);
     this.editorUpdateSubject.next(this.editorOptions);
 
     // Updating in local storage for cache

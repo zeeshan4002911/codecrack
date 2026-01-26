@@ -9,8 +9,13 @@ CREATE TABLE codecrack_code_store (
     "modified_code" TEXT,
     "theme_mode" TEXT,
     "selected_language" TEXT,
-    "editor_options" TEXT
+    "editor_options" TEXT,
+    "whiteboard_data" TEXT
 );
+
+
+ALTER TABLE codecrack_code_store
+ADD COLUMN whiteboard_data TEXT;
 
 /*
  For Local

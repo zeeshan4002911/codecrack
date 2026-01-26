@@ -41,7 +41,7 @@ export default {
 			response = {
 				success: false,
 				status: 404,
-				body: { message: "Not Found" }
+				body: { message: "Route Not Found" }
 			};
 		}
 
@@ -71,8 +71,16 @@ async function pushCode(request, env, ctx) {
 		modifiedCode,
 		themeMode,
 		selectedLanguage,
-		editorOptions
+		editorOptions,
+		whiteboardData
 	} = await request.json();
+
+	/**
+	 * Note:
+	 * The column name should be strictly underscore case (No camelCase in-between)
+	 * as in UI app, Conversion of underscore case to camel case using humps is happening
+	 * Which requires the key to be in CamelCase for the underscore places only
+	 */
 
 	const result = await env.codecrackD1.prepare(`
 		INSERT OR REPLACE INTO codecrack_code_store (
@@ -84,9 +92,10 @@ async function pushCode(request, env, ctx) {
 			modified_code,
 			theme_mode,
 			selected_language,
-			editor_options
+			editor_options,
+			whiteboard_data
 		)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`).bind(
 		codeShareId,
 		null,
@@ -96,7 +105,8 @@ async function pushCode(request, env, ctx) {
 		modifiedCode ?? null,
 		themeMode ?? null,
 		selectedLanguage ?? null,
-		editorOptions ?? null
+		editorOptions ?? null,
+		whiteboardData ?? null
 	).run();
 
 	if (result.success) {

@@ -51,8 +51,8 @@ export class WhiteboardView implements OnDestroy {
   private draggedLayerIndex: number | null = null;
   private draggedElement: HTMLElement | null = null;
 
-  @Input() data: WhiteboardElement[] = [];
-  @Output() dataChange = new EventEmitter<WhiteboardElement[]>();
+  @Input() data: string = "";
+  @Output() dataChange = new EventEmitter<string>();
 
   boardId = 'whiteboard-app';
 
@@ -239,6 +239,10 @@ export class WhiteboardView implements OnDestroy {
           console.warn("No such action exists", action);
       }
     });
+
+    this._appInit.whiteboardDataUpdate$.pipe(takeUntil(this._destroy)).subscribe(whiteboardUpdatedData => {
+      if (whiteboardUpdatedData) this.initRender(whiteboardUpdatedData);
+    })
   }
 
   ngOnDestroy(): void {
@@ -258,7 +262,23 @@ export class WhiteboardView implements OnDestroy {
   }
 
   onDataChange(data: WhiteboardElement[]): void {
-    this.dataChange.emit(data);
+    const exportData = this.whiteboardService.exportData();
+    this.dataChange.emit(exportData);
+  }
+
+  initRender(whiteboardUpdatedData?: string) {
+    try {
+      const strData = (whiteboardUpdatedData) ? whiteboardUpdatedData : this.data;
+      if (!strData) {
+        console.error("No initial data to load");
+        return;
+      }
+      this.whiteboardService.clear();
+      this.whiteboardService.importData(strData);
+      this.showMoreMenu.set(false);
+    } catch (error) {
+      console.error('Import failed:', error);
+    }
   }
 
   selectTool(tool: ToolType) {
@@ -792,6 +812,7 @@ export class WhiteboardView implements OnDestroy {
 
   onReady() {
     console.log('Whiteboard ready');
+    this.initRender();
   }
 
   private setupClickOutsideHandler(): void {
