@@ -37,6 +37,9 @@ export class AppInit {
     whiteboardData: ''
   };
 
+  // Store having editor and diffEditor key with monaco editor view state as value
+  editorStateStore: any = {};
+
   constructor(
     private _localStorageService: LocalStorageService,
     private _cloudStorageService: CloudStorageService
@@ -87,6 +90,12 @@ export class AppInit {
     const whiteboardDataCache = this._localStorageService.get('whiteboardData');
     if (whiteboardDataCache) {
       this.whiteboardData = whiteboardDataCache;
+    }
+
+    // Update editor state e.g., scroll and cursor position from localStorage if it exists
+    const editorStateCache = this._localStorageService.get('editorViewStateStore');
+    if (editorStateCache) {
+      this.editorStateStore = editorStateCache;
     }
 
     /* Listener with debounce to save code to localStorage  */
@@ -215,6 +224,12 @@ export class AppInit {
     this.whiteboardDataSubject.next(data);
   }
 
+  // Cacheing the editors state on change of tab to local storage
+  setEditorState(editorStateUpdate: object) {
+    this.editorStateStore = { ...this.editorStateStore, ...editorStateUpdate };
+    this._localStorageService.set('editorViewStateStore', this.editorStateStore);
+  }
+
   resetApp() {
     this._localStorageService.clear();
     // location.reload();
@@ -279,6 +294,7 @@ export class AppInit {
     payload['codeShareId'] = this.codeShareId;
     payload['editorOptions'] = JSON.stringify(payload['editorOptions']);
     payload['selectedLanguage'] = JSON.stringify(payload['selectedLanguage']);
+    delete payload['editorViewStateStore'];
 
     this._cloudStorageService.pushCodeHandler(payload).subscribe({
       next: (response) => {

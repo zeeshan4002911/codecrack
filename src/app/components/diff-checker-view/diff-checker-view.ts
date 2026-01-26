@@ -200,6 +200,12 @@ export class DiffCheckerView implements AfterViewInit, OnDestroy {
       const code = modifiedEditor.getValue() ?? "";
       this._appInit.setModifiedCode(code);
     });
+
+    // Setting up the view state if it's present in local storage
+    const diffEditorCacheState = this._appInit.editorStateStore['diffEditor'];
+    if (diffEditorCacheState) {
+      this.diffEditorInstance.restoreViewState(diffEditorCacheState);
+    }
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -213,6 +219,11 @@ export class DiffCheckerView implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this._destroy.next(false);
     this._destroy.complete();
-    if (this.diffEditorInstance) this.diffEditorInstance.dispose();
+    if (this.diffEditorInstance) {
+      // Saving the view state for scroll position, expand methods, etc.
+      const state = this.diffEditorInstance.saveViewState();
+      this._appInit.setEditorState({"diffEditor":  state})
+      this.diffEditorInstance.dispose();
+    }
   }
 }

@@ -140,6 +140,12 @@ export class EditorView implements AfterViewInit, OnDestroy, OnChanges {
       const code = this.editorInstance?.getValue() ?? "";
       this._appInit.setEditorCode(code);
     });
+
+    // Saving the view state for scroll position, expand methods, etc.
+    const editorCacheState = this._appInit.editorStateStore['editor'];
+    if (editorCacheState) {
+      this.editorInstance.restoreViewState(editorCacheState);
+    }
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -153,6 +159,11 @@ export class EditorView implements AfterViewInit, OnDestroy, OnChanges {
   ngOnDestroy(): void {
     this._destroy.next(false);
     this._destroy.complete();
-    if (this.editorInstance) this.editorInstance.dispose();
+    if (this.editorInstance) {
+      // Saving the view state for scroll position, expand methods, etc.
+      const state = this.editorInstance.saveViewState();
+      this._appInit.setEditorState({ "editor": state });
+      this.editorInstance.dispose();
+    }
   }
 }
