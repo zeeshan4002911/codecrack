@@ -267,7 +267,7 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
       const screenHeight = this.viewContainerRef?.nativeElement?.offsetHeight ?? 0;
       const screenWidth = this.viewContainerRef?.nativeElement?.offsetWidth ?? 0;
       this.editorSize = { width: screenWidth, height: screenHeight };
-      this.terminalLayout = this._appInit.terminalLayout || "bottom";
+      this.terminalLayout = this._appInit.terminalLayout;
       this._cdr.detectChanges();
     }, 0);
   }
@@ -283,6 +283,7 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onTerminalLayoutChange(selectedLayout: string) {
+    if (!selectedLayout) return;
     this.terminalLayout = selectedLayout;
     this._appInit.terminalLayout = selectedLayout;
   }
