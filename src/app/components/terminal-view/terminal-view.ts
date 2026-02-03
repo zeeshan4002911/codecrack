@@ -112,10 +112,8 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
     this.layoutUpdateEvent.emit(this.selectedLayout);
     const screenHeight = this.viewContainer?.nativeElement?.offsetHeight ?? 0;
     const screenWidth = this.viewContainer?.nativeElement?.offsetWidth ?? 0;
-    this.isResizableEnable = false;
     this.isDraggableEnable = false;
     if (layoutName == "bottom") {
-      this.isResizableEnable = true;
       this.position.top = screenHeight - this.size.height;
       this.position.left = 0;
       this.size.width = screenWidth;
@@ -128,14 +126,12 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
       this.size.width = this.defaultSize.width;
       this.sizeUpdateEvent.emit({ ...this.size });
     } else if (layoutName == "right") {
-      this.isResizableEnable = true;
       this.position.top = 0;
       this.position.left = screenWidth - this.size.width;
       this.size.height = screenHeight;
       this.size.width = this.defaultSize.width;
       this.sizeUpdateEvent.emit({ ...this.size });
     } else if (layoutName == "separate-window") {
-      this.isResizableEnable = true;
       this.isDraggableEnable = true;
       this.size = { ... this.defaultSize };
       this.position = { top: 50, left: 50 };
@@ -186,12 +182,16 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
         let newWidth = screenWidth - this.position.left;
         newLeft = Math.min(Math.max(0, newLeft), screenWidth - this.defaultSize.minWidth);
         newWidth = Math.max(this.defaultSize.minWidth, newWidth);
-        
+
         this.position.left = newLeft;
         this.size.width = newWidth;
         this.sizeUpdateEvent.emit({ ...this.size });
       } else if (this.selectedLayout == "left") {
-        
+        let newWidth = clientX;
+        newWidth = Math.max(this.defaultSize.minWidth, Math.min(newWidth, screenWidth));
+
+        this.size.width = newWidth;
+        this.sizeUpdateEvent.emit({ ...this.size });
       } else if (this.selectedLayout == "separate-window") {
         let newWidth = clientX - this.position.left;
         let newHeight = clientY - this.position.top;
