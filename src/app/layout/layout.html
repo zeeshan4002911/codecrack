@@ -183,7 +183,8 @@
         <app-terminal-view
           [viewContainer]="viewContainerRef"
           [selectedLayout]="terminalLayout"
-          (sizeEmitter)="onTerminalResize($event)"
+          (sizeUpdateEvent)="onTerminalResize($event)"
+          (layoutUpdateEvent)="onTerminalLayoutChange($event)"
         ></app-terminal-view>
       }
     }

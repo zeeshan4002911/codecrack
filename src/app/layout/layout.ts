@@ -267,20 +267,24 @@ export class Layout implements OnInit, AfterViewInit, OnDestroy {
       const screenHeight = this.viewContainerRef?.nativeElement?.offsetHeight ?? 0;
       const screenWidth = this.viewContainerRef?.nativeElement?.offsetWidth ?? 0;
       this.editorSize = { width: screenWidth, height: screenHeight };
-      this.terminalLayout = this.terminalLayout || "bottom";
+      this.terminalLayout = this._appInit.terminalLayout || "bottom";
       this._cdr.detectChanges();
     }, 0);
   }
 
-  onTerminalResize(size: { width: number, height: number, layout: string }) {
+  onTerminalResize(size: { width: number, height: number }) {
     const screenHeight = this.viewContainerRef?.nativeElement?.offsetHeight ?? 0;
     const screenWidth = this.viewContainerRef?.nativeElement?.offsetWidth ?? 0;
 
     const width = screenWidth - size.width > 0 ? screenWidth - size.width : screenWidth;
     const height = screenHeight - size.height > 0 ? screenHeight - size.height : screenHeight;
     this.editorSize = { width: width, height: height };
-    this.terminalLayout = size.layout;
     this._cdr.detectChanges();
+  }
+
+  onTerminalLayoutChange(selectedLayout: string) {
+    this.terminalLayout = selectedLayout;
+    this._appInit.terminalLayout = selectedLayout;
   }
 
   bModalPrimaryBtnClickHandler() {

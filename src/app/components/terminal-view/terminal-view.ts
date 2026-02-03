@@ -14,7 +14,8 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
   private _destroy: Subject<boolean> = new Subject<boolean>();
   @Input() viewContainer!: ElementRef | undefined;
   @Input() selectedLayout: string = "";
-  @Output() sizeEmitter = new EventEmitter<{ width: number, height: number, layout: string }>();
+  @Output() sizeUpdateEvent = new EventEmitter<{ width: number, height: number }>();
+  @Output() layoutUpdateEvent = new EventEmitter<string>();
 
   position = { top: 50, left: 50 };
   defaultSize = { width: 300, height: 200 };
@@ -108,6 +109,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
 
   layoutChangeHandler(layoutName: string): void {
     this.selectedLayout = layoutName;
+    this.layoutUpdateEvent.emit(this.selectedLayout);
     const screenHeight = this.viewContainer?.nativeElement?.offsetHeight ?? 0;
     const screenWidth = this.viewContainer?.nativeElement?.offsetWidth ?? 0;
     this.isResizableEnable = false;
@@ -118,25 +120,25 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
       this.position.left = 0;
       this.size.width = screenWidth;
       this.size.height = this.defaultSize.height;
-      this.sizeEmitter.emit({ ...this.size, layout: layoutName });
+      this.sizeUpdateEvent.emit({ ...this.size });
     } else if (layoutName == "left") {
       this.position.top = 0;
       this.position.left = 0;
       this.size.height = screenHeight;
       this.size.width = this.defaultSize.width;
-      this.sizeEmitter.emit({ ...this.size, layout: layoutName });
+      this.sizeUpdateEvent.emit({ ...this.size });
     } else if (layoutName == "right") {
       this.position.top = 0;
       this.position.left = screenWidth - this.size.width;
       this.size.height = screenHeight;
       this.size.width = this.defaultSize.width;
-      this.sizeEmitter.emit({ ...this.size, layout: layoutName });
+      this.sizeUpdateEvent.emit({ ...this.size });
     } else if (layoutName == "separate-window") {
       this.isResizableEnable = true;
       this.isDraggableEnable = true;
       this.size = { ... this.defaultSize };
       this.position = { top: 50, left: 50 };
-      this.sizeEmitter.emit({ width: 0, height: 0, layout: layoutName });
+      this.sizeUpdateEvent.emit({ width: 0, height: 0 });
     }
   }
 
@@ -177,7 +179,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
 
         this.position.top = newTop;
         this.size.height = newHeight;
-        this.sizeEmitter.emit({ ...this.size, layout: this.selectedLayout });
+        this.sizeUpdateEvent.emit({ ...this.size });
       } else if (this.selectedLayout == "separate-window") {
         let newWidth = clientX - this.position.left;
         let newHeight = clientY - this.position.top;

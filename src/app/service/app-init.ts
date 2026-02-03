@@ -10,6 +10,7 @@ import * as humps from 'humps';
 })
 export class AppInit {
   private codeShareId: string = "";
+  private _terminalLayout: string = "bottom";
 
   // Check browser preferred theme based on user's browser setting
   prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -98,6 +99,11 @@ export class AppInit {
       this.editorStateStore = editorStateCache;
     }
 
+    const cachedTerminalLayout = this._localStorageService.get('terminalLayout');
+    if (cachedTerminalLayout) {
+      this._terminalLayout = cachedTerminalLayout;
+    }
+
     /* Listener with debounce to save code to localStorage  */
     const debounTime = 3000;
     this.editorCodeSubject.pipe(
@@ -132,6 +138,14 @@ export class AppInit {
   setCodeShareId(codeShareId: string) {
     this.codeShareId = codeShareId;
     this._localStorageService.set('codeshareId', this.codeShareId);
+  }
+
+  public get terminalLayout(): string {
+    return this._terminalLayout;
+  }
+  public set terminalLayout(selectedLayout: string) {
+    this._terminalLayout = selectedLayout;
+    this._localStorageService.set('terminalLayout', selectedLayout);
   }
 
   /* Theme variables, logic and persistency */
