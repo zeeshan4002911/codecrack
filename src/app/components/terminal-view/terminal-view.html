@@ -6,8 +6,7 @@
     'top': position.top + 'px', 
     'left': position.left + 'px', 
     'width': size.width + 'px', 
-    'height': size.height + 'px',
-    'cursor': selectedLayout === 'separate-window' ? 'move': ''
+    'height': size.height + 'px'
   }"
 >
 
@@ -17,6 +16,9 @@
     [ngClass]="{
       'header-dark': isDarkMode,
       'header-light': !isDarkMode
+    }"
+    [ngStyle]="{
+      'cursor': selectedLayout === 'separate-window' ? 'move': ''
     }"
     (mousedown)="dragStartHandler($event)"
     (touchstart)="dragStartHandler($event)"
@@ -91,8 +93,6 @@
   }
   @else if (selectedLayout === 'separate-window') {
     <div class="resize-handler-window d-flex" (mousedown)="resizeStartHandler($event)" 
-      (touchstart)="resizeStartHandler($event)">
-      <i class="bi bi-bounding-box resize-handler-icon"></i>
-    </div>
+      (touchstart)="resizeStartHandler($event)"></div>
   }
 </div>
