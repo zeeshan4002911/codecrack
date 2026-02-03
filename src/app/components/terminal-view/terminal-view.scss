@@ -99,12 +99,17 @@
       }
 
       &-window {
+        font-size: 0.8rem;
         width: 0.8rem;
         height: 0.8rem;
         position: absolute;
         bottom: 0;
         right: 0;
         cursor: se-resize;
+
+        span {
+          font-size: inherit;
+        }
       }
 
       &-icon {

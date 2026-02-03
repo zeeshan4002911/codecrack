@@ -93,6 +93,8 @@
   }
   @else if (selectedLayout === 'separate-window') {
     <div class="resize-handler-window d-flex" (mousedown)="resizeStartHandler($event)" 
-      (touchstart)="resizeStartHandler($event)"></div>
+      (touchstart)="resizeStartHandler($event)">
+      <span class="material-icons">south_east</span>
+    </div>
   }
 </div>

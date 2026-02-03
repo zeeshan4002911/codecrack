@@ -113,6 +113,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
     this.isResizableEnable = false;
     this.isDraggableEnable = false;
     if (layoutName == "bottom") {
+      this.isResizableEnable = true;
       this.position.top = screenHeight - this.size.height;
       this.position.left = 0;
       this.size.width = screenWidth;
@@ -166,22 +167,34 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
       const screenHeight = this.viewContainer?.nativeElement?.offsetHeight ?? 0;
       const screenWidth = this.viewContainer?.nativeElement?.offsetWidth ?? 0;
 
-      let newWidth = clientX - this.position.left;
-      let newHeight = clientY - this.position.top;
+      if (this.selectedLayout == "bottom") {
+        const appHeader = document.getElementById('app-header')?.offsetHeight ?? 0;
+        let newTop = clientY - appHeader;
+        let newHeight = screenHeight - this.position.top;
+        // Restrict the top to not go beyond the app header and not below the default size
+        newTop = Math.min(Math.max(0, newTop), screenHeight - this.defaultSize.height);
+        newHeight = Math.max(this.defaultSize.height, newHeight);
 
-      // Restrict width and height to not exceed screen or container dimensions
-      newWidth = Math.min(newWidth, screenWidth - this.position.left);
-      newHeight = Math.min(newHeight, screenHeight - this.position.top);
+        this.position.top = newTop;
+        this.size.height = newHeight;
+        this.sizeEmitter.emit({ ...this.size, layout: this.selectedLayout });
+      } else if (this.selectedLayout == "separate-window") {
+        let newWidth = clientX - this.position.left;
+        let newHeight = clientY - this.position.top;
 
-      const minWidth = 300;
-      const minHeight = 200;
-      newWidth = Math.max(newWidth, minWidth);
-      newHeight = Math.max(newHeight, minHeight);
+        // Restrict width and height to not exceed screen or container dimensions
+        newWidth = Math.min(newWidth, screenWidth - this.position.left);
+        newHeight = Math.min(newHeight, screenHeight - this.position.top);
 
-      // Update size with new constrained values
-      this.size.width = newWidth;
-      this.size.height = newHeight;
+        const minWidth = 300;
+        const minHeight = 200;
+        newWidth = Math.max(newWidth, minWidth);
+        newHeight = Math.max(newHeight, minHeight);
 
+        // Update size with new constrained values
+        this.size.width = newWidth;
+        this.size.height = newHeight;
+      }
     } else if (this.isDragging) {
       this.position.left = clientX - this.dragStart.x;
       this.position.top = clientY - this.dragStart.y;
