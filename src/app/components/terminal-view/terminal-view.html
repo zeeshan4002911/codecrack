@@ -55,6 +55,15 @@
         class="bi bi-box-arrow-down-left separate-window cursor-pointer"
         [ngClass]="{'active-border': selectedLayout === 'separate-window'}"
       ></i>
+      <i 
+        class="bi cursor-pointer"
+        [ngClass]="{
+          'bi-lock': !isResizableEnable,
+          'bi-unlock': isResizableEnable
+        }"
+        (click)="toggleResizeHandler()"
+        (touchstart)="toggleResizeHandler()"
+      ></i>
     </div>
   </div>
 

@@ -139,6 +139,10 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
     }
   }
 
+  toggleResizeHandler() {
+    this.isResizableEnable = !this.isResizableEnable;
+  }
+
   // This method initializes the drag event when mouse is pressed or touch start
   dragStartHandler(event: MouseEvent | TouchEvent): void {
     if (!this.isDraggableEnable) return;
@@ -154,6 +158,10 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
   resizeStartHandler(event: MouseEvent | TouchEvent): void {
     event.preventDefault();
     if (this.isResizableEnable) this.isResizing = true;
+    else this._appInit.dispatchAction("bToast", {
+      "type": "info",
+      "message": "Size is locked 🔒"
+    })
   }
 
   // Mouse or touch move handler for dragging and resizing
