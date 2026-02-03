@@ -18,7 +18,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
   @Output() layoutUpdateEvent = new EventEmitter<string>();
 
   position = { top: 50, left: 50 };
-  defaultSize = { width: 300, height: 200 };
+  defaultSize = { width: 300, height: 200, minWidth: 100, minHeight: 100 };
   size = { width: 300, height: 200 };
   dragStart = { x: 0, y: 0 };
   isResizableEnable: boolean = true;
@@ -128,6 +128,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
       this.size.width = this.defaultSize.width;
       this.sizeUpdateEvent.emit({ ...this.size });
     } else if (layoutName == "right") {
+      this.isResizableEnable = true;
       this.position.top = 0;
       this.position.left = screenWidth - this.size.width;
       this.size.height = screenHeight;
@@ -174,12 +175,23 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
         let newTop = clientY - appHeader;
         let newHeight = screenHeight - this.position.top;
         // Restrict the top to not go beyond the app header and not below the default size
-        newTop = Math.min(Math.max(0, newTop), screenHeight - this.defaultSize.height);
-        newHeight = Math.max(this.defaultSize.height, newHeight);
+        newTop = Math.min(Math.max(0, newTop), screenHeight - this.defaultSize.minHeight);
+        newHeight = Math.max(this.defaultSize.minHeight, newHeight);
 
         this.position.top = newTop;
         this.size.height = newHeight;
         this.sizeUpdateEvent.emit({ ...this.size });
+      } else if (this.selectedLayout == "right") {
+        let newLeft = clientX;
+        let newWidth = screenWidth - this.position.left;
+        newLeft = Math.min(Math.max(0, newLeft), screenWidth - this.defaultSize.minWidth);
+        newWidth = Math.max(this.defaultSize.minWidth, newWidth);
+        
+        this.position.left = newLeft;
+        this.size.width = newWidth;
+        this.sizeUpdateEvent.emit({ ...this.size });
+      } else if (this.selectedLayout == "left") {
+        
       } else if (this.selectedLayout == "separate-window") {
         let newWidth = clientX - this.position.left;
         let newHeight = clientY - this.position.top;
