@@ -1,12 +1,15 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, WritableSignal, signal, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AppInit } from '@/service/app-init';
 import { Subject, takeUntil } from 'rxjs';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { CodeRunnerService } from './code-runner-service';
 
 @Component({
   selector: 'app-terminal-view',
-  imports: [CommonModule],
+  imports: [CommonModule, MatMenuModule, MatIconModule, MatButtonModule],
   templateUrl: './terminal-view.html',
   styleUrl: './terminal-view.scss',
 })
@@ -32,6 +35,9 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
   workerStatus: boolean = false;
   selectedLanguage: any = {};
   terminalFontSize: number | undefined = 16;
+  @ViewChild('terminalHeader') terminalHeader!: ElementRef;
+  terminalControlOverflowSignal: WritableSignal<boolean> = signal(false);
+  cacheMinWidth: number = 0;
 
   constructor(
     private _appInit: AppInit,
@@ -137,6 +143,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
       this.position = { top: 50, left: 50 };
       this.sizeUpdateEvent.emit({ width: 0, height: 0 });
     }
+    this.checkControlOverflow();
   }
 
   toggleResizeHandler() {
@@ -217,6 +224,9 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
         this.size.width = newWidth;
         this.size.height = newHeight;
       }
+
+      this.checkControlOverflow();
+
     } else if (this.isDragging) {
       this.position.left = clientX - this.dragStart.x;
       this.position.top = clientY - this.dragStart.y;
@@ -255,6 +265,20 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
     }
   }
 
+  checkControlOverflow(): void {
+    const terminalHeader = this.terminalHeader.nativeElement;
+    let isOverflow = false;
+    if (this.terminalControlOverflowSignal()) {
+      isOverflow = this.cacheMinWidth > terminalHeader.clientWidth;
+    } else {
+      isOverflow = terminalHeader.scrollWidth > terminalHeader.clientWidth;
+    }
+
+    if (isOverflow) this.cacheMinWidth = terminalHeader.scrollWidth;
+    // Signal the change detection if overflow value change
+    this.terminalControlOverflowSignal.set(isOverflow);
+  }
+
   ngOnDestroy(): void {
     this._destroy.next(false);
     this._destroy.complete();
@@ -268,5 +292,6 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
     this.workerStatus = false;
     this.selectedLanguage = {};
     this.terminalFontSize = undefined;
+    this.cacheMinWidth = 0;
   }
 }

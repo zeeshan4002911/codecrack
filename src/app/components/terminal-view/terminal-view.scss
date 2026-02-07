@@ -27,8 +27,29 @@
         color: black;
       }
 
-      .terminal-control {
+      .terminal-control-container {
         gap: 0.5rem;
+
+        .mdc-icon-button {
+          width: fit-content;
+          padding: 0;
+          height: 100%;
+        }
+
+        .mat-mdc-button-touch-target {
+          width: 100%;
+          height: 100%;
+        }
+
+        .mat-icon {
+          font-size: 1rem;
+          height: 100%;
+          width: 100%;
+        }
+
+        .terminal-control {
+          gap: 0.5rem;
+        }
       }
 
       .active-border {
@@ -121,4 +142,8 @@
       }
     }
   }
+}
+
+::ng-deep .mat-mdc-menu-panel {
+  min-width: unset !important; /* Removes the 112px default */
 }

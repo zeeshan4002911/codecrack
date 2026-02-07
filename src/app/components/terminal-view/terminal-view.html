@@ -11,8 +11,9 @@
 >
 
   <!-- Header Section -->
-  <div 
-    class="header d-flex justify-content-between py-1 px-2"
+  <div
+    #terminalHeader
+    class="header d-flex justify-content-between py-1 px-2 align-items-center"
     [ngClass]="{
       'header-dark': isDarkMode,
       'header-light': !isDarkMode
@@ -24,13 +25,33 @@
     (touchstart)="dragStartHandler($event)"
   >
     <div>Terminal</div>
-    <div class="terminal-control d-flex">
-      <i 
-        (click)="runCode()"
-        (touchstart)="runCode()"
-        class="bi bi-play-fill cursor-pointer"
-        [ngClass]="{'run-disable': !workerStatus}"
-      ></i>
+    <div class="terminal-control-container d-flex">
+      <button matIconButton>
+        <mat-icon
+          (click)="runCode()"
+          (touchstart)="runCode()"
+          [ngClass]="{'run-disable': !workerStatus}"
+        >play_arrow</mat-icon>
+      </button>
+      
+      <div>
+        @if (terminalControlOverflowSignal()) {
+          <button matIconButton [matMenuTriggerFor]="menu" class="d-flex align-items-center justify-content-center">
+            <mat-icon class="align-content-center">more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <ng-container *ngTemplateOutlet="terminalControls"></ng-container>
+          </mat-menu>
+        } @else {
+          <ng-container *ngTemplateOutlet="terminalControls"></ng-container>
+        }
+      </div>
+    </div>
+  </div>
+
+  <ng-template #terminalControls>
+    <div [class]="'terminal-control d-flex align-items-center justify-content-center ' + (terminalControlOverflowSignal() ? 'flex-column px-2': '')"
+    >
       <i 
         (click)="layoutChangeHandler('bottom');layoutChangeHandler('bottom');" 
         (touchstart)="layoutChangeHandler('bottom');layoutChangeHandler('bottom');" 
@@ -65,7 +86,7 @@
         (touchstart)="toggleResizeHandler()"
       ></i>
     </div>
-  </div>
+  </ng-template>
 
   <!-- Terminal Content -->
   <div 
