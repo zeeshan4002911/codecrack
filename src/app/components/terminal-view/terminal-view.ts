@@ -146,8 +146,12 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
     this.checkControlOverflow();
   }
 
-  toggleResizeHandler() {
+  toggleLockUnlockHandler(event: Event) {
+    if (event.type === 'touchstart') {
+      event.preventDefault();
+    }
     this.isResizableEnable = !this.isResizableEnable;
+    this.isDraggableEnable = (this.isResizableEnable) ? true: false;
   }
 
   // This method initializes the drag event when mouse is pressed or touch start
@@ -167,7 +171,7 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
     if (this.isResizableEnable) this.isResizing = true;
     else this._appInit.dispatchAction("bToast", {
       "type": "info",
-      "message": "Size is locked 🔒"
+      "message": "Change is locked 🔒"
     })
   }
 
@@ -266,7 +270,8 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
   }
 
   checkControlOverflow(): void {
-    const terminalHeader = this.terminalHeader.nativeElement;
+    const terminalHeader = this.terminalHeader?.nativeElement;
+    if (!terminalHeader) return;
     let isOverflow = false;
     if (this.terminalControlOverflowSignal()) {
       isOverflow = this.cacheMinWidth > terminalHeader.clientWidth;

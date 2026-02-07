@@ -82,8 +82,8 @@
           'bi-lock': !isResizableEnable,
           'bi-unlock': isResizableEnable
         }"
-        (click)="toggleResizeHandler()"
-        (touchstart)="toggleResizeHandler()"
+        (click)="toggleLockUnlockHandler($event)"
+        (touchstart)="toggleLockUnlockHandler($event)"
       ></i>
     </div>
   </ng-template>
