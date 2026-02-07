@@ -190,7 +190,8 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
         let newTop = clientY - appHeader;
         let newHeight = screenHeight - this.position.top;
         // Restrict the top to not go beyond the app header and not below the default size
-        newTop = Math.min(Math.max(0, newTop), screenHeight - this.defaultSize.minHeight);
+        const minValue = this.defaultSize.minHeight, maxValue = screenHeight - this.defaultSize.minHeight
+        newTop = Math.min(Math.max(minValue, newTop), maxValue);
         newHeight = Math.max(this.defaultSize.minHeight, newHeight);
 
         this.position.top = newTop;
@@ -199,7 +200,8 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
       } else if (this.selectedLayout == "right") {
         let newLeft = clientX;
         let newWidth = screenWidth - this.position.left;
-        newLeft = Math.min(Math.max(0, newLeft), screenWidth - this.defaultSize.minWidth);
+        const minValue = this.defaultSize.minWidth, maxValue = screenWidth - this.defaultSize.minWidth;
+        newLeft = Math.min(Math.max(minValue, newLeft), maxValue);
         newWidth = Math.max(this.defaultSize.minWidth, newWidth);
 
         this.position.left = newLeft;
@@ -207,7 +209,8 @@ export class TerminalView implements OnInit, AfterViewInit, OnDestroy, OnChanges
         this.sizeUpdateEvent.emit({ ...this.size });
       } else if (this.selectedLayout == "left") {
         let newWidth = clientX;
-        newWidth = Math.max(this.defaultSize.minWidth, Math.min(newWidth, screenWidth));
+        const minValue = this.defaultSize.minWidth, maxValue = screenWidth - this.defaultSize.minWidth;
+        newWidth = Math.max(minValue, Math.min(newWidth, maxValue));
 
         this.size.width = newWidth;
         this.sizeUpdateEvent.emit({ ...this.size });
