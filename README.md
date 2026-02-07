@@ -72,3 +72,9 @@ And then later Vite gets added for development, version 7.2.2 with @analogjs/vit
 > * Code Share Module Added
 > * Added Cloudflare worker and D1 Storage for cloud storage based persistency
 > * Confirmation Dialogs and Alert Toaster Added
+
+##### 07 Feb, 2026
+> * Whiteboard with local persistency
+> * Terminal Layout with resize and drag feature
+> * Code Runner worker based for JS, TS and Python with user Input support
+> * Added UI Enhancement and feature for Share Panel and editor view state persistency
